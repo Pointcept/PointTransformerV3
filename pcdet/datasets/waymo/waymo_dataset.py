@@ -448,13 +448,23 @@ class WaymoDataset(DatasetTemplate):
 
             return ap_result_str, ap_dict
 
+        def waymo_custom_eval(eval_det_annos, infos, output_path):
+            from . import waymo_utils
+            waymo_utils.create_pd_detection(eval_det_annos, infos, output_path)
+            return '', {}
+        
         eval_det_annos = copy.deepcopy(det_annos)
-        eval_gt_annos = [copy.deepcopy(info['annos']) for info in self.infos]
-
-        if kwargs['eval_metric'] == 'kitti':
-            ap_result_str, ap_dict = kitti_eval(eval_det_annos, eval_gt_annos)
-        elif kwargs['eval_metric'] == 'waymo':
-            ap_result_str, ap_dict = waymo_eval(eval_det_annos, eval_gt_annos)
+        
+        if kwargs['eval_metric'] in ['kitti', 'waymo']:
+            if 'annos' not in self.infos[0].keys():
+                return 'No ground-truth boxes for evaluation', {}
+            eval_gt_annos = [copy.deepcopy(info['annos']) for info in self.infos]
+            if kwargs['eval_metric'] == 'kitti':
+                ap_result_str, ap_dict = kitti_eval(eval_det_annos, eval_gt_annos)
+            else:
+                ap_result_str, ap_dict = waymo_eval(eval_det_annos, eval_gt_annos)
+        elif kwargs['eval_metric'] == 'waymo_custom':
+            ap_result_str, ap_dict = waymo_custom_eval(eval_det_annos, self.infos, kwargs['output_path'])
         else:
             raise NotImplementedError
 
@@ -706,10 +716,11 @@ def create_waymo_infos(dataset_cfg, class_names, data_path, save_path,
         dataset_cfg=dataset_cfg, class_names=class_names, root_path=data_path,
         training=False, logger=common_utils.create_logger()
     )
-    train_split, val_split = 'train', 'val'
+    train_split, val_split, test_split = 'train', 'val', 'test'
 
     train_filename = save_path / ('%s_infos_%s.pkl' % (processed_data_tag, train_split))
     val_filename = save_path / ('%s_infos_%s.pkl' % (processed_data_tag, val_split))
+    test_filename = save_path / ('%s_infos_%s.pkl' % (processed_data_tag, test_split))
 
     os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
     print('---------------Start to generate data infos---------------')
@@ -733,6 +744,16 @@ def create_waymo_infos(dataset_cfg, class_names, data_path, save_path,
     with open(val_filename, 'wb') as f:
         pickle.dump(waymo_infos_val, f)
     print('----------------Waymo info val file is saved to %s----------------' % val_filename)
+
+    dataset.set_split(test_split)
+    waymo_infos_test = dataset.get_infos(
+        raw_data_path=data_path / raw_data_tag,
+        save_path=save_path / processed_data_tag, num_workers=workers, has_label=False,
+        sampled_interval=1, update_info_only=update_info_only
+    )
+    with open(test_filename, 'wb') as f:
+        pickle.dump(waymo_infos_test, f)
+    print('----------------Waymo info test file is saved to %s----------------' % test_filename)
 
     if update_info_only:
         return

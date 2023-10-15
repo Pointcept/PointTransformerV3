@@ -10,7 +10,9 @@ import numpy as np
 from ...utils import common_utils
 import tensorflow as tf
 from waymo_open_dataset.utils import frame_utils, transform_utils, range_image_utils
-from waymo_open_dataset import dataset_pb2
+from waymo_open_dataset import dataset_pb2, label_pb2
+from waymo_open_dataset.protos import metrics_pb2
+from tqdm import tqdm
 
 try:
     tf.enable_eager_execution()
@@ -18,6 +20,50 @@ except:
     pass
 
 WAYMO_CLASSES = ['unknown', 'Vehicle', 'Pedestrian', 'Sign', 'Cyclist']
+
+
+def create_pd_detection(detections, infos, result_path):
+    """Creates a prediction objects file."""
+    result_path.mkdir(parents=True, exist_ok=True)
+    objects = metrics_pb2.Objects()
+
+    for info, detection in tqdm(zip(infos, detections)):
+
+        names = detection['name']
+        scores = detection['score']
+        boxes_lidar = detection['boxes_lidar']
+
+        for i in range(boxes_lidar.shape[0]):
+            det  = boxes_lidar[i]
+            score = scores[i]
+            label = names[i]
+
+            o = metrics_pb2.Object()
+            o.context_name = info['metadata']['context_name']
+            o.frame_timestamp_micros = info['metadata']['timestamp_micros']
+
+            # Populating box and score.
+            box = label_pb2.Label.Box()
+            box.center_x = det[0]
+            box.center_y = det[1]
+            box.center_z = det[2]
+            box.length = det[3]
+            box.width = det[4]
+            box.height = det[5]
+            box.heading = det[-1]
+            o.object.box.CopyFrom(box)
+            o.score = score
+            # Use correct type.
+            o.object.type = WAYMO_CLASSES.index(label) 
+
+            objects.objects.append(o)
+
+    # Write objects to a file.
+    path = result_path / 'detection_pred.bin'
+
+    print("results saved to {}".format(path))
+    with open(path, 'wb') as f:
+        f.write(objects.SerializeToString())
 
 
 def generate_labels(frame, pose):
