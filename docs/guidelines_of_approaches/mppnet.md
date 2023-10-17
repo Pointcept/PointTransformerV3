@@ -12,18 +12,18 @@ Please refer to [GETTING_STARTED.md](docs/GETTING_STARTED.md) to process the Way
 
 1.  Train the RPN model for MPPNet (centerpoint_4frames is employed in the paper)
 ```shell
-bash scripts/dist_train.sh ${NUM_GPUS} --cfg_file cfgs/waymo_models/centerpoint_4frames.yaml
+bash scripts/dist_train.sh ${NUM_GPUS} --cfg_file cfgs/waymo_models/centerpoint_2_4frames.yaml
 ```
 The ckpt will be saved in ../output/waymo_models/centerpoint_4frames/default/ckpt.
 
 2.  Save the RPN model's prediction results of training and val dataset
 ```shell
 # training
-bash scripts/dist_test.sh ${NUM_GPUS}  --cfg_file cfgs/waymo_models/centerpoint_4frames.yaml \
+bash scripts/dist_test.sh ${NUM_GPUS}  --cfg_file cfgs/waymo_models/centerpoint_2_4frames.yaml \
 --ckpt ../output/waymo_models/centerpoint_4frames/default/ckpt/checkpoint_epoch_36.pth \
 --set DATA_CONFIG.DATA_SPLIT.test train
 # val
-bash scripts/dist_test.sh ${NUM_GPUS}  --cfg_file cfgs/waymo_models/centerpoint_4frames.yaml \
+bash scripts/dist_test.sh ${NUM_GPUS}  --cfg_file cfgs/waymo_models/centerpoint_2_4frames.yaml \
 --ckpt ../output/waymo_models/centerpoint_4frames/default/ckpt/checkpoint_epoch_36.pth \
 --set DATA_CONFIG.DATA_SPLIT.test val
 ```
@@ -66,7 +66,7 @@ The default parameters in mppnet_e2e_memorybank_inference.yaml is for 4-frame an
 ## Performance
 |    Model          | Vec_L1 | Vec_L2 | Ped_L1 | Ped_L2 | Cyc_L1 | Cyc_L2 |  
 |:---------------------------------------------:|:----------:|:-------:|:-------:|:-------:|:-------:|:-------:|
-|  [centerpoint_4frames](../../tools/cfgs/waymo_models/centerpoint_4frames.yaml) | 76.71/76.17 | 69.13/68.63 | 78.88/75.55 | 71.73/68.61 | 73.73/72.96 | 71.63/70.89 |
+|  [centerpoint_4frames](../../tools/cfgs/waymo_models/centerpoint_2_4frames.yaml) | 76.71/76.17 | 69.13/68.63 | 78.88/75.55 | 71.73/68.61 | 73.73/72.96 | 71.63/70.89 |
 |  [mppnet_4frames](../../tools/cfgs/waymo_models/mppnet_4frames.yaml) | 81.54/81.06 | 74.07/73.61 | 84.56/81.94 | 77.20/74.67 | 77.15/76.50 | 75.01/74.38 |
 | [mppnet_16frames](../../tools/cfgs/waymo_models/mppnet_16frames.yaml) | 82.74/82.28 | 75.41/74.96 | 84.69/82.25 | 77.43/75.06 | 77.28/76.66 | 75.13/74.52 |
 
