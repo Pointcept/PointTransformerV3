@@ -72,7 +72,7 @@ class Point(Dict):
         self["z_order"] = order
         self["z_inverse"] = inverse
 
-    def sparsify(self, pad=96):
+    def sparsify(self, pad=96, sp_choice_idx=[0, 1, 2]):
         """
         Point Cloud Serialization
 
@@ -89,9 +89,9 @@ class Point(Dict):
         sparse_conv_feat = spconv.SparseConvTensor(
             features=self.feat,
             indices=torch.cat(
-                [self.batch.unsqueeze(-1).int(), self.grid_coord.int()], dim=1
+                [self.batch.unsqueeze(-1).int(), self.grid_coord.int()[:, sp_choice_idx]], dim=1
             ).contiguous(),
-            spatial_shape=sparse_shape,
+            spatial_shape=[sparse_shape[i] for i in sp_choice_idx],
             batch_size=self.batch[-1].tolist() + 1,
         )
         self["sparse_shape"] = sparse_shape

@@ -267,13 +267,14 @@ class Block(PointModule):
         shift=False,
         order_index=0,
         cpe_indice_key=None,
+        sp_dim=3
     ):
         super().__init__()
         self.channels = channels
         self.pre_norm = pre_norm
 
         self.cpe = PointSequential(
-            spconv.SubMConv3d(
+            getattr(spconv, f"SubMConv{sp_dim}d")(
                 channels,
                 channels,
                 kernel_size=3,
@@ -457,13 +458,14 @@ class Embedding(PointModule):
         embed_channels,
         norm_layer=None,
         act_layer=None,
+        sp_dim=3,
     ):
         super().__init__()
         self.in_channels = in_channels
         self.embed_channels = embed_channels
 
         self.stem = PointSequential(
-            conv=spconv.SubMConv3d(
+            conv=getattr(spconv, f"SubMConv{sp_dim}d")(
                 in_channels,
                 embed_channels,
                 kernel_size=5,
@@ -488,10 +490,6 @@ class PointTransformerV3(torch.nn.Module):
         model_cfg,
         input_channels,
         grid_size,
-        enc_depths=(2, 2, 2, 2),
-        enc_channels=(16, 32, 64, 128),
-        enc_num_head=(2, 4, 8, 16),
-        enc_patch_size=(64, 64, 64, 64),
         mlp_ratio=4,
         qkv_bias=True,
         qk_scale=None,
@@ -509,6 +507,11 @@ class PointTransformerV3(torch.nn.Module):
         **kwargs
     ):
         super().__init__()
+        enc_depths = model_cfg.enc_depths
+        enc_channels = model_cfg.enc_channels
+        enc_num_head = model_cfg.enc_num_head
+        enc_patch_size = model_cfg.enc_patch_size
+        self.sp_choice_idx = model_cfg.sp_choice_idx  # [1, 2] for pillar
         self.num_stages = len(enc_depths)
         self.order = [order] if isinstance(order, str) else order
         self.sparse_shape = grid_size[::-1]
@@ -550,6 +553,7 @@ class PointTransformerV3(torch.nn.Module):
             embed_channels=enc_channels[0],
             norm_layer=bn_layer,
             act_layer=act_layer,
+            sp_dim=len(self.sp_choice_idx)
         )
 
         enc_drop_path = [
@@ -592,21 +596,22 @@ class PointTransformerV3(torch.nn.Module):
                         shift=False if i % 2 == 0 else True,
                         order_index=(i >> 1) % len(self.order),
                         cpe_indice_key=f"stage{s}",
+                        sp_dim=len(self.sp_choice_idx)
                     ),
                     name=f"block{i}",
                 )
             if len(enc) != 0:
                 self.enc.add(module=enc, name=f"enc{s}")
 
-        self.out = spconv.SparseSequential(
-            # [200, 150, 5] -> [200, 150, 2]
-            spconv.SparseConv3d(
-                enc_channels[-1], enc_channels[-1], (3, 1, 1),
-                stride=(2, 1, 1), padding=0,
-                bias=False, indice_key='spconv_down2'),
-            bn_layer(128),
-            nn.ReLU(),
-        )
+        # self.out = spconv.SparseSequential(
+        #     # [200, 150, 5] -> [200, 150, 2]
+        #     spconv.SparseConv3d(
+        #         enc_channels[-1], enc_channels[-1], (3, 1, 1),
+        #         stride=(2, 1, 1), padding=0,
+        #         bias=False, indice_key='spconv_down2'),
+        #     bn_layer(128),
+        #     nn.ReLU(),
+        # )
 
     def forward(self, batch_dict):
         feat, voxel_coords = batch_dict['voxel_features'], batch_dict['voxel_coords']
@@ -614,13 +619,15 @@ class PointTransformerV3(torch.nn.Module):
         grid_coord = voxel_coords[:, 1:].long()
         point = Point(feat=feat, batch=batch, grid_coord=grid_coord, sparse_shape=self.sparse_shape)
         point.serialization(order=self.order)
-        point.sparsify()
+        point.sparsify(sp_choice_idx=self.sp_choice_idx)
 
         point = self.embedding(point)
         point = self.enc(point)
 
-        batch_dict.update({
-            'encoded_spconv_tensor': self.out(point.sparse_conv_feat),
-            'encoded_spconv_tensor_stride': 2 ** (self.num_stages - 1)
-        })
+        # batch_dict.update({
+        #     'encoded_spconv_tensor': self.out(point.sparse_conv_feat),
+        #     'encoded_spconv_tensor_stride': 2 ** (self.num_stages - 1)
+        # })
+        batch_dict['pillar_features'] = batch_dict['voxel_features'] = point.feat
+        batch_dict['voxel_coords'] = voxel_coords
         return batch_dict

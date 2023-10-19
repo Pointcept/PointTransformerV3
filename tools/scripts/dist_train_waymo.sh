@@ -3,9 +3,9 @@
 PYTHON=python
 
 DATASET=waymo
-CONFIG=centerpoint
+CONFIG=centerpoint_ptv3_pillar
 TAG=default
-GPU=None
+GPU=4
 WORKERS=2
 
 while getopts "p:c:t:g:" opt; do
@@ -48,12 +48,12 @@ train.py \
 --workers ${WORKERS} \
 --extra_tag $TAG \
 --max_ckpt_save_num 1 \
---num_epochs_to_eval 1 \
+--num_epochs_to_eval 1
 
-#echo " =========> EVAL TASK <========="
-#EPOCH=epoch_30
-#WAYMO_GT=../data/waymo/gt.bin
-#WAYMO_EVAL=../data/waymo/compute_detection_metrics_main
-#WAYMO_EXP_DIR=../output/$CFG_NAME/$TAG/eval/eval_with_train/$EPOCH/val/final_result/data
-#
-#$WAYMO_EVAL ${WAYMO_EXP_DIR}/detection_pred.bin ${WAYMO_GT} | tee ${WAYMO_EXP_DIR}/metric.txt
+echo " =========> EVAL TASK <========="
+EPOCH=epoch_24
+WAYMO_GT=../data/waymo/gt.bin
+WAYMO_EVAL=../data/waymo/compute_detection_metrics_main
+WAYMO_EXP_DIR=../output/$CFG_NAME/$TAG/eval/eval_with_train/$EPOCH/val/final_result/data
+
+$WAYMO_EVAL ${WAYMO_EXP_DIR}/detection_pred.bin ${WAYMO_GT} | tee ${WAYMO_EXP_DIR}/metric.txt
