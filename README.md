@@ -13,7 +13,7 @@ This repo is the official project repository of the paper **_Point Transformer V
 </div>
 
 ## Highlights
-- *Dec, 2023*: We release of project repo for PTv3, if you have any question related to our work, please feel free to open an issue.
+- *Dec, 2023*: We released our project repo for PTv3, if you have any questions related to our work, please feel free to open an issue. Subscribe to our updates by filling out the [form](https://forms.gle/jHoBNqfhqK94WG678) and the subscription can be canceled by editing the form.
 
 ## Schedule
 To make our polished code and reproduced experiments available as soon as possible, this time we will release what we already finished immediately after a validation instead of releasing them together after all work is done. We list a task list as follows:
