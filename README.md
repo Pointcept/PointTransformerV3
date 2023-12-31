@@ -13,15 +13,26 @@ This repo is the official project repository of the paper **_Point Transformer V
 </div>
 
 ## Highlights
-- *Dec, 2023*: We released our project repo for PTv3, if you have any questions related to our work, please feel free to open an issue. Subscribe to our updates by filling out the [form](https://forms.gle/jHoBNqfhqK94WG678) and the subscription can be canceled by editing the form.
+- *Dec 31, 2023*: We released the model code of PTv3, experiment records for scratched ScanNet and ScanNet200 are now available. More will be available soon.
+- *Dec 19, 2023*: We released our project repo for PTv3, if you have any questions related to our work, please feel free to open an issue. Subscribe to our updates by filling out the [form](https://forms.gle/jHoBNqfhqK94WG678) and the subscription can be canceled by editing the form.
+
+
+## Overview
+- [Schedule](#schedule)
+- [Citation](#citation)
+- [Installation](#installation)
+- [Data Preparation](#data-preparation)
+- [Quick Start](#quick-start)
+- [Model Zoo](#model-zoo)
+
 
 ## Schedule
 To make our polished code and reproduced experiments available as soon as possible, this time we will release what we already finished immediately after a validation instead of releasing them together after all work is done. We list a task list as follows:
 
-- [ ] Release model code of PTv3;
+- [x] Release model code of PTv3;
 - [ ] Release scratched config and record of indoor semantic segmentation;
-  - [ ] ScanNet
-  - [ ] ScanNet200
+  - [x] ScanNet
+  - [x] ScanNet200
   - [ ] S3DIS
   - [ ] S3DIS 6-Fold (with cross-validation script) 
 - [ ] Release pre-trained config and record of indoor semantic segmentation;
@@ -72,3 +83,100 @@ If you find _PTv3_ useful to your research, please cite our work as an acknowled
     year={2023}
 }
 ```
+
+## Installation
+
+### Requirements
+ PTv3 relies on FlashAttention, while FlashAttention relies on the following requirement, make sure your local Pointcept environment satisfies the requirements:
+
+(Recommendation)
+- Ubuntu: 20.04 and above
+- CUDA: 11.6 and above
+- PyTorch: 1.12.0 and above
+
+If you can not upgrade your local environment to satisfy the above-recommended requirements, the following requirement is the minimum to run PTv3 with Pointcept, and you need to disable Flash Attention to enable PTv3:
+
+(Minimum)
+- Ubuntu: 18.04 and above
+- CUDA: 11.3 and above
+- PyTorch: 1.10.0 and above
+
+### Environment
+
+- Base environment
+```bash
+conda create -n pointcept python=3.8 -y
+conda activate pointcept
+conda install ninja -y
+# Choose version you want here: https://pytorch.org/get-started/previous-versions/
+# We use CUDA 11.8 and PyTorch 2.1.0 for our development of PTv3
+conda install pytorch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 pytorch-cuda=11.8 -c pytorch -c nvidia
+conda install h5py pyyaml -c anaconda -y
+conda install sharedarray tensorboard tensorboardx yapf addict einops scipy plyfile termcolor timm -c conda-forge -y
+conda install pytorch-cluster pytorch-scatter pytorch-sparse -c pyg -y
+pip install torch-geometric
+
+cd libs/pointops
+python setup.py install
+cd ../..
+
+# spconv (SparseUNet)
+# refer https://github.com/traveller59/spconv
+pip install spconv-cu118  # choose version match your local cuda version
+
+# Open3D (visualization, optional)
+pip install open3d
+```
+
+- Flash Attention
+
+Following [README](https://github.com/Dao-AILab/flash-attention?tab=readme-ov-file#installation-and-features) in Flash Attention repo and install Flash Attention for PTv3. This installation is optional, but we recommend enabling Flash Attention for PTv3.
+
+
+## Data Preparation
+Please further refer Pointcept readme [Data Preparation](https://github.com/Pointcept/Pointcept#data-preparation) section.
+
+## Quick Start
+### Two running scenarios
+We provide two running scenarios for PTv3, Pointcept-driven and custom-framework-driven. For the former one, you only need to clone the code of Pointcept to your local and follow the [Quick Start](https://github.com/Pointcept/Pointcept#quick-start) in Pointcept to run PTv3:
+```bash
+git clone https://github.com/Pointcept/Pointcept.git
+sh scripts/train.sh -p ${INTERPRETER_PATH} -g ${NUM_GPU} -d ${DATASET_NAME} -c ${CONFIG_NAME} -n ${EXP_NAME}
+```
+For the latter scenario, we offer a distinct instance of PTv3, disassociated from our Pointcept framework. To incorporate this code into your project, clone the project repo and copy the following file/folder to your project:
+```bash
+git clone https://github.com/Pointcept/PointTransformerV3.git
+cp model.py ${PATH_TO_YOUR_PROJECT}
+cp -r serialization ${PATH_TO_YOUR_PROJECT}
+```
+Align the input dictionary defined in our [model](https://github.com/Pointcept/PointTransformerV3/blob/dev/model.py#L968) file and the model will return the encoded feature of the given batch point cloud.
+
+### Flash Attention
+The full PTv3 relies on Flash Attention, while Flash Attention relies on CUDA 11.6 and above, make sure your local Pointcept environment satisfies the requirements.
+
+If you can not upgrade your local environment to satisfy the requirements (CUDA >= 11.6), then you can disable FlashAttention by setting the model parameter `enable_flash` to `false` and reducing the `enc_patch_size` and `dec_patch_size` to a level (e.g. 128).
+
+FlashAttention force disables RPE and forces the accuracy reduced to fp16. If you require these features, please disable `enable_flash` and adjust `enable_rpe`, `upcast_attention` and`upcast_softmax`.
+
+
+## Model Zoo
+### 1. Indoor semantic segmentation
+| Model |   Benchmark   | Additional Data | Num GPUs | Val mIoU | Config | Tensorboard | Exp Record |
+| :---: |:-------------:| :---: | :---: | :---: | :---: | :---: | :---: |
+| PTv3 |    ScanNet    | &cross; | 4 | 77.6% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/scannet/semseg-pt-v3m1-0-base.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard?params=scalars%26runSelectionState%3DeyJzY2FubmV0MjAwLXNlbXNlZy1wdC12M20xLTAtYmFzZSI6ZmFsc2UsInNjYW5uZXQtc2Vtc2VnLXB0LXYzbTEtMC1iYXNlIjp0cnVlfQ%253D%253D%26_smoothingWeight%3D0#frame) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/scannet-semseg-pt-v3m1-0-base) |
+| PTv3 + PPT |    ScanNet    | &check; | 8 |  |  |  |  |
+| PTv3 |  ScanNet200   | &cross; | 4 | 35.3% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/scannet200/semseg-pt-v3m1-0-base.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard?params=scalars%26runSelectionState%3DeyJzY2FubmV0MjAwLXNlbXNlZy1wdC12M20xLTAtYmFzZSI6dHJ1ZSwic2Nhbm5ldC1zZW1zZWctcHQtdjNtMS0wLWJhc2UiOmZhbHNlfQ%253D%253D%26_smoothingWeight%3D0#frame) |[link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/scannet200-semseg-pt-v3m1-0-base)|
+| PTv3 + PPT |  ScanNet200   | &check; | 8 |  |  |  |  |
+| PTv3 | S3DIS (Area5) | &cross; | 4 |  |  |  |  |
+| PTv3 + PPT | S3DIS (Area5) | &check; | 8 |  |  |  |  |
+
+```bash
+# ScanNet Scratched
+sh scripts/train.sh -g 4 -d scannet -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
+
+# ScanNet200 Scratched
+sh scripts/train.sh -g 4 -d scannet200 -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
+
+# More configs and exp record for PTv3 will be available soon. (Before Feb 2024) 
+```
+
