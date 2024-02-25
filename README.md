@@ -5,7 +5,7 @@
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/point-transformer-v3-simpler-faster-stronger/3d-semantic-segmentation-on-scannet200)](https://paperswithcode.com/sota/3d-semantic-segmentation-on-scannet200?p=point-transformer-v3-simpler-faster-stronger)  
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/point-transformer-v3-simpler-faster-stronger/3d-semantic-segmentation-on-semantickitti)](https://paperswithcode.com/sota/3d-semantic-segmentation-on-semantickitti?p=point-transformer-v3-simpler-faster-stronger)  
 
-This repo is the official project repository of the paper **_Point Transformer V3: Simpler, Faster, Stronger_** and is mainly used for releasing schedules, updating instructions, sharing experiment records (contains model weight), and handling issues. The code will be updated in _[Pointcept](https://github.com/Pointcept/Pointcept) v1.5_.  
+This repo is the official project repository of the paper **_Point Transformer V3: Simpler, Faster, Stronger_** and is mainly used for releasing schedules, updating instructions, sharing experiment records (containing model weight), and handling issues. The code will be updated in _[Pointcept](https://github.com/Pointcept/Pointcept) v1.5_.  
 [ Backbone ] [PTv3] - [ [arXiv](https://arxiv.org/abs/2312.10035) ] [ [Bib](https://xywu.me/research/ptv3/bib.txt) ] [ [Code](https://github.com/Pointcept/Pointcept) ]  
 
 <div align='left'>
@@ -33,17 +33,17 @@ To make our polished code and reproduced experiments available as soon as possib
 - [ ] Release scratched config and record of indoor semantic segmentation;
   - [x] ScanNet
   - [x] ScanNet200
-  - [ ] S3DIS
+  - [x] S3DIS
   - [ ] S3DIS 6-Fold (with cross-validation script) 
 - [ ] Release pre-trained config and record of indoor semantic segmentation;
-  - [ ] ScanNet (ScanNet + S3DIS + Structured3D)
+  - [x] ScanNet (ScanNet + S3DIS + Structured3D)
   - [ ] ScanNet200 (Fine-tuned from above)
-  - [ ] S3DIS (ScanNet + S3DIS + Structured3D)
+  - [x] S3DIS (ScanNet + S3DIS + Structured3D)
   - [ ] S3DIS 6-Fold (Fine-tuned from ScanNet + Structured3D)
 - [ ] Release scratched config and record of outdoor semantic segmentation;
-  - [ ] NuScenes
+  - [x] NuScenes
   - [ ] SemanticKITTI
-  - [ ] Waymo
+  - [x] Waymo
 - [ ] Release pre-trained config and record of outdoor semantic segmentation;
   - [ ] NuScenes (NuScenes + SemanticKITTI + Waymo)
   - [ ] SemanticKITTI (NuScenes + SemanticKITTI + Waymo)
@@ -161,22 +161,52 @@ FlashAttention force disables RPE and forces the accuracy reduced to fp16. If yo
 
 ## Model Zoo
 ### 1. Indoor semantic segmentation
-| Model |   Benchmark   | Additional Data | Num GPUs | Val mIoU | Config | Tensorboard | Exp Record |
-| :---: |:-------------:| :---: | :---: | :---: | :---: | :---: | :---: |
-| PTv3 |    ScanNet    | &cross; | 4 | 77.6% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/scannet/semseg-pt-v3m1-0-base.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard?params=scalars%26runSelectionState%3DeyJzY2FubmV0MjAwLXNlbXNlZy1wdC12M20xLTAtYmFzZSI6ZmFsc2UsInNjYW5uZXQtc2Vtc2VnLXB0LXYzbTEtMC1iYXNlIjp0cnVlfQ%253D%253D%26_smoothingWeight%3D0#frame) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/scannet-semseg-pt-v3m1-0-base) |
-| PTv3 + PPT |    ScanNet    | &check; | 8 |  |  |  |  |
-| PTv3 |  ScanNet200   | &cross; | 4 | 35.3% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/scannet200/semseg-pt-v3m1-0-base.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard?params=scalars%26runSelectionState%3DeyJzY2FubmV0MjAwLXNlbXNlZy1wdC12M20xLTAtYmFzZSI6dHJ1ZSwic2Nhbm5ldC1zZW1zZWctcHQtdjNtMS0wLWJhc2UiOmZhbHNlfQ%253D%253D%26_smoothingWeight%3D0#frame) |[link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/scannet200-semseg-pt-v3m1-0-base)|
-| PTv3 + PPT |  ScanNet200   | &check; | 8 |  |  |  |  |
-| PTv3 | S3DIS (Area5) | &cross; | 4 |  |  |  |  |
-| PTv3 + PPT | S3DIS (Area5) | &check; | 8 |  |  |  |  |
+| Model | Benchmark | Additional Data | Num GPUs | Val mIoU | Config | Tensorboard | Exp Record |
+| :---: | :---: |:---------------:| :---: | :---: | :---: | :---: | :---: |
+| PTv3 | ScanNet |     &cross;     | 4 | 77.6% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/scannet/semseg-pt-v3m1-0-base.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/scannet-semseg-pt-v3m1-0-base) |
+| PTv3 + PPT | ScanNet |     &check;     | 8 | 78.5% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/scannet/semseg-pt-v3m1-1-ppt-extreme.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/scannet-semseg-pt-v3m1-1-ppt-extreme) |
+| PTv3 | ScanNet200 |     &cross;     | 4 | 35.3% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/scannet200/semseg-pt-v3m1-0-base.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) |[link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/scannet200-semseg-pt-v3m1-0-base)|
+| PTv3 + PPT | ScanNet200 | &check; (f.t.)  | 4 |  |  |  |  |
+| PTv3 | S3DIS (Area5) |     &cross;     | 4 | 73.6% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/s3dis/semseg-pt-v3m1-0-rpe.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/s3dis-semseg-pt-v3m1-0-rpe) |
+| PTv3 + PPT | S3DIS (Area5) |     &check;     | 8 | 75.4% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/s3dis/semseg-pt-v3m1-1-ppt-extreme.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/s3dis-semseg-pt-v3m1-1-ppt-extreme) |
 
+Example running scripts are as follows:
 ```bash
-# ScanNet Scratched
+# Scratched ScanNet
 sh scripts/train.sh -g 4 -d scannet -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
+# PPT joint training (ScanNet + Structured3D) and evaluate in ScanNet
+sh scripts/train.sh -g 8 -d scannet -c semseg-pt-v3m1-1-ppt-extreme -n semseg-pt-v3m1-1-ppt-extreme
 
-# ScanNet200 Scratched
+# Scratched ScanNet200
 sh scripts/train.sh -g 4 -d scannet200 -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
+# Fine-tuning from  PPT joint training (ScanNet + Structured3D) with ScanNet200
+# TODO
 
-# More configs and exp record for PTv3 will be available soon. (Before Feb 2024) 
+# Scratched S3DIS, S3DIS rely on RPE, also an example for disable flash attention
+sh scripts/train.sh -g 4 -d s3dis -c semseg-pt-v3m1-0-rpe -n semseg-pt-v3m1-0-rpe
+# PPT joint training (ScanNet + S3DIS + Structured3D) and evaluate in ScanNet
+sh scripts/train.sh -g 8 -d s3dis -c semseg-pt-v3m1-1-ppt-extreme -n semseg-pt-v3m1-1-ppt-extreme
+
+# More configs and exp records for PTv3 will be available soon.
 ```
 
+### 2.Outdoor semantic segmentation
+| Model | Benchmark | Additional Data | Num GPUs | Val mIoU | Config | Tensorboard | Exp Record |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| PTv3 | nuScenes | &cross; | 4 | 80.3 | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/nuscenes/semseg-pt-v3m1-0-base.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard)|[link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/nuscenes-semseg-pt-v3m1-0-base) |
+| PTv3 + PPT | nuScenes | &check; | 8 | | | | |
+| PTv3 | SemanticKITTI | &cross; | 4 | | | | |
+| PTv3 + PPT | SemanticKITTI | &check; | 8 | | | | |
+| PTv3 | Waymo | &cross; | 4 | 71.2 | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/waymo/semseg-pt-v3m1-0-base.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/waymo-semseg-pt-v3m1-0-base) (log only) |
+| PTv3 + PPT | Waymo | &check; | 8 | | | | |
+* Model weights trained with Waymo Open Dataset cannot be released due to the regulations. 
+
+Example running scripts are as follows:
+```bash
+# Scratched nuScenes
+sh scripts/train.sh -g 4 -d nuscenes -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
+# Scratched Waymo
+sh scripts/train.sh -g 4 -d waymo -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
+
+# More configs and exp records for PTv3 will be available soon.
+```
