@@ -13,6 +13,7 @@ This repo is the official project repository of the paper **_Point Transformer V
 </div>
 
 ## Highlights
+- *Feb 28, 2024*: PTv3 is accepted by CVPR'24 🎉🎉🎉. 
 - *Dec 31, 2023*: We released the model code of PTv3, experiment records for scratched ScanNet and ScanNet200 are now available. More will be available soon.
 - *Dec 19, 2023*: We released our project repo for PTv3, if you have any questions related to our work, please feel free to open an issue. Subscribe to our updates by filling out the [form](https://forms.gle/jHoBNqfhqK94WG678) and the subscription can be canceled by editing the form.
 
@@ -30,16 +31,16 @@ This repo is the official project repository of the paper **_Point Transformer V
 To make our polished code and reproduced experiments available as soon as possible, this time we will release what we already finished immediately after a validation instead of releasing them together after all work is done. We list a task list as follows:
 
 - [x] Release model code of PTv3;
-- [ ] Release scratched config and record of indoor semantic segmentation;
+- [x] Release scratched config and record of indoor semantic segmentation;
   - [x] ScanNet
   - [x] ScanNet200
   - [x] S3DIS
-  - [ ] S3DIS 6-Fold (with cross-validation script) 
+  - [x] S3DIS 6-Fold (with cross-validation script) 
 - [ ] Release pre-trained config and record of indoor semantic segmentation;
   - [x] ScanNet (ScanNet + S3DIS + Structured3D)
   - [ ] ScanNet200 (Fine-tuned from above)
   - [x] S3DIS (ScanNet + S3DIS + Structured3D)
-  - [ ] S3DIS 6-Fold (Fine-tuned from ScanNet + Structured3D)
+  - [x] S3DIS 6-Fold (Fine-tuned from ScanNet + Structured3D)
 - [ ] Release scratched config and record of outdoor semantic segmentation;
   - [x] NuScenes
   - [ ] SemanticKITTI
@@ -60,13 +61,18 @@ To make our polished code and reproduced experiments available as soon as possib
 ## Citation
 If you find _PTv3_ useful to your research, please cite our work as an acknowledgment. (੭ˊ꒳​ˋ)੭✧
 ```bib
-@misc{wu2023ptv3,
-      title={Point Transformer V3: Simpler, Faster, Stronger}, 
-      author={Xiaoyang Wu and Li Jiang and Peng-Shuai Wang and Zhijian Liu and Xihui Liu and Yu Qiao and Wanli Ouyang and Tong He and Hengshuang Zhao},
-      year={2023},
-      eprint={2312.10035},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV}
+@inproceedings{wu2024ptv3,
+    title={Point Transformer V3: Simpler, Faster, Stronger},
+    author={Wu, Xiaoyang and Jiang, Li and Wang, Peng-Shuai and Liu, Zhijian and Liu, Xihui and Qiao, Yu and Ouyang, Wanli and He, Tong and Zhao, Hengshuang},
+    booktitle={CVPR},
+    year={2024}
+}
+
+@inproceedings{wu2024ppt,
+    title={Towards Large-scale 3D Representation Learning with Multi-dataset Point Prompt Training},
+    author={Wu, Xiaoyang and Tian, Zhuotao and Wen, Xin and Peng, Bohao and Liu, Xihui and Yu, Kaicheng and Zhao, Hengshuang},
+    booktitle={CVPR},
+    year={2024}
 }
 
 @inproceedings{wu2022ptv2,
@@ -203,6 +209,27 @@ sh scripts/train.sh -g 8 -d s3dis -c semseg-pt-v3m1-1-ppt-extreme -n semseg-pt-v
 
 Example running scripts are as follows:
 ```bash
+# Scratched ScanNet
+sh scripts/train.sh -g 4 -d scannet -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
+# PPT joint training (ScanNet + Structured3D) and evaluate in ScanNet
+sh scripts/train.sh -g 8 -d scannet -c semseg-pt-v3m1-1-ppt-extreme -n semseg-pt-v3m1-1-ppt-extreme
+
+# Scratched ScanNet200
+sh scripts/train.sh -g 4 -d scannet200 -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
+# Fine-tuning from  PPT joint training (ScanNet + Structured3D) with ScanNet200
+# TODO
+
+# Scratched S3DIS, S3DIS rely on RPE, also an example for disable flash attention
+sh scripts/train.sh -g 4 -d s3dis -c semseg-pt-v3m1-0-rpe -n semseg-pt-v3m1-0-rpe
+# PPT joint training (ScanNet + S3DIS + Structured3D) and evaluate in ScanNet
+sh scripts/train.sh -g 8 -d s3dis -c semseg-pt-v3m1-1-ppt-extreme -n semseg-pt-v3m1-1-ppt-extreme
+# S3DIS 6-fold cross validation
+# 1. The default configs are evaluated on Area_5, modify the "data.train.split", "data.val.split", and "data.test.split" to make the config evaluated on Area_1 ~ Area_6 respectively.
+# 2. Train and evaluate the model on each split of areas and gather result files located in "exp/s3dis/EXP_NAME/result/Area_x.pth" in one single folder, noted as RECORD_FOLDER.
+# 3. Run the following script to get S3DIS 6-fold cross validation performance:
+export PYTHONPATH=./
+python tools/test_s3dis_6fold.py --record_root ${RECORD_FOLDER}
+
 # Scratched nuScenes
 sh scripts/train.sh -g 4 -d nuscenes -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
 # Scratched Waymo
