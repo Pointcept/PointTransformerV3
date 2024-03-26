@@ -176,6 +176,8 @@ FlashAttention force disables RPE and forces the accuracy reduced to fp16. If yo
 | PTv3 | S3DIS (Area5) |     &cross;     | 4 | 73.6% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/s3dis/semseg-pt-v3m1-0-rpe.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/s3dis-semseg-pt-v3m1-0-rpe) |
 | PTv3 + PPT | S3DIS (Area5) |     &check;     | 8 | 75.4% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/s3dis/semseg-pt-v3m1-1-ppt-extreme.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/s3dis-semseg-pt-v3m1-1-ppt-extreme) |
 
+_**\*Released model weights are temporarily invalid as the model structure of PTv3 is adjusted.**_
+
 Example running scripts are as follows:
 ```bash
 # Scratched ScanNet
@@ -205,7 +207,9 @@ sh scripts/train.sh -g 8 -d s3dis -c semseg-pt-v3m1-1-ppt-extreme -n semseg-pt-v
 | PTv3 + PPT | SemanticKITTI | &check; | 8 | | | | |
 | PTv3 | Waymo | &cross; | 4 | 71.2 | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/waymo/semseg-pt-v3m1-0-base.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/waymo-semseg-pt-v3m1-0-base) (log only) |
 | PTv3 + PPT | Waymo | &check; | 8 | | | | |
-* Model weights trained with Waymo Open Dataset cannot be released due to the regulations. 
+
+_**\*Released model weights are temporarily invalid as the model structure of PTv3 is adjusted.**_  
+_**\*Model weights trained with Waymo Open Dataset cannot be released due to the regulations.**_
 
 Example running scripts are as follows:
 ```bash
