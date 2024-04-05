@@ -13,6 +13,7 @@ This repo is the official project repository of the paper **_Point Transformer V
 </div>
 
 ## Highlights
+- *Apr 05, 2024*: PTv3 is selected as one of the 90 **Oral** presentations (3.3% accepted paper, 0.78% submissions) by CVPR'24!
 - *Feb 28, 2024*: PTv3 is accepted by CVPR'24 🎉🎉🎉. 
 - *Dec 31, 2023*: We released the model code of PTv3, experiment records for scratched ScanNet and ScanNet200 are now available. More will be available soon.
 - *Dec 19, 2023*: We released our project repo for PTv3, if you have any questions related to our work, please feel free to open an issue. Subscribe to our updates by filling out the [form](https://forms.gle/jHoBNqfhqK94WG678) and the subscription can be canceled by editing the form.
