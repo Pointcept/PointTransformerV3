@@ -156,7 +156,7 @@ git clone https://github.com/Pointcept/PointTransformerV3.git
 cp model.py ${PATH_TO_YOUR_PROJECT}
 cp -r serialization ${PATH_TO_YOUR_PROJECT}
 ```
-Align the input dictionary defined in our [model](https://github.com/Pointcept/PointTransformerV3/blob/dev/model.py#L968) file and the model will return the encoded feature of the given batch point cloud.
+Align the input dictionary defined in our [model](https://github.com/Pointcept/PointTransformerV3/blob/main/model.py#L968) file and the model will return the encoded feature of the given batch point cloud.
 
 ### Flash Attention
 The full PTv3 relies on Flash Attention, while Flash Attention relies on CUDA 11.6 and above, make sure your local Pointcept environment satisfies the requirements.
