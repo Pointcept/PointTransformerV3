@@ -1,15 +1,22 @@
 # Point Transformer V3
+This repo is the official project repository of the paper **_Point Transformer V3: Simpler, Faster, Stronger_** and is mainly used for releasing schedules, updating instructions, sharing experiment records (containing model weight), and handling issues. The code will be updated in _[Pointcept](https://github.com/Pointcept/Pointcept) v1.5_.  
+[ Backbone ] [PTv3] - [ [arXiv](https://arxiv.org/abs/2312.10035) ] [ [Bib](https://xywu.me/research/ptv3/bib.txt) ] [ [Code](https://github.com/Pointcept/Pointcept) ]  
+
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/point-transformer-v3-simpler-faster-stronger/lidar-semantic-segmentation-on-nuscenes)](https://paperswithcode.com/sota/lidar-semantic-segmentation-on-nuscenes?p=point-transformer-v3-simpler-faster-stronger)  
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/point-transformer-v3-simpler-faster-stronger/semantic-segmentation-on-s3dis)](https://paperswithcode.com/sota/semantic-segmentation-on-s3dis?p=point-transformer-v3-simpler-faster-stronger)  
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/point-transformer-v3-simpler-faster-stronger/semantic-segmentation-on-scannet)](https://paperswithcode.com/sota/semantic-segmentation-on-scannet?p=point-transformer-v3-simpler-faster-stronger)  
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/point-transformer-v3-simpler-faster-stronger/3d-semantic-segmentation-on-scannet200)](https://paperswithcode.com/sota/3d-semantic-segmentation-on-scannet200?p=point-transformer-v3-simpler-faster-stronger)  
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/point-transformer-v3-simpler-faster-stronger/3d-semantic-segmentation-on-semantickitti)](https://paperswithcode.com/sota/3d-semantic-segmentation-on-semantickitti?p=point-transformer-v3-simpler-faster-stronger)  
 
-This repo is the official project repository of the paper **_Point Transformer V3: Simpler, Faster, Stronger_** and is mainly used for releasing schedules, updating instructions, sharing experiment records (containing model weight), and handling issues. The code will be updated in _[Pointcept](https://github.com/Pointcept/Pointcept) v1.5_.  
-[ Backbone ] [PTv3] - [ [arXiv](https://arxiv.org/abs/2312.10035) ] [ [Bib](https://xywu.me/research/ptv3/bib.txt) ] [ [Code](https://github.com/Pointcept/Pointcept) ]  
-
 <div align='left'>
 <img src="assets/teaser.png" alt="teaser" width="800" />
+</div>
+
+## Sonata: Self-supervised pre-trained PTv3
+🚀 Check out our latest powerful self-supervised pre-trained PTv3, [Sonata](https://github.com/facebookresearch/sonata), which includes various visual demos with our pre-trained PTv3.
+
+<div align='left'>
+<img src="https://raw.githubusercontent.com/pointcept/assets/main/sonata/demo.png" alt="teaser" width="800" />
 </div>
 
 ## Highlights
@@ -20,44 +27,11 @@ This repo is the official project repository of the paper **_Point Transformer V
 
 
 ## Overview
-- [Schedule](#schedule)
 - [Citation](#citation)
 - [Installation](#installation)
 - [Data Preparation](#data-preparation)
 - [Quick Start](#quick-start)
 - [Model Zoo](#model-zoo)
-
-
-## Schedule
-To make our polished code and reproduced experiments available as soon as possible, this time we will release what we already finished immediately after a validation instead of releasing them together after all work is done. We list a task list as follows:
-
-- [x] Release model code of PTv3;
-- [x] Release scratched config and record of indoor semantic segmentation;
-  - [x] ScanNet
-  - [x] ScanNet200
-  - [x] S3DIS
-  - [x] S3DIS 6-Fold (with cross-validation script) 
-- [ ] Release pre-trained config and record of indoor semantic segmentation;
-  - [x] ScanNet (ScanNet + S3DIS + Structured3D)
-  - [ ] ScanNet200 (Fine-tuned from above)
-  - [x] S3DIS (ScanNet + S3DIS + Structured3D)
-  - [x] S3DIS 6-Fold (Fine-tuned from ScanNet + Structured3D)
-- [ ] Release scratched config and record of outdoor semantic segmentation;
-  - [x] NuScenes
-  - [ ] SemanticKITTI
-  - [x] Waymo
-- [ ] Release pre-trained config and record of outdoor semantic segmentation;
-  - [ ] NuScenes (NuScenes + SemanticKITTI + Waymo)
-  - [ ] SemanticKITTI (NuScenes + SemanticKITTI + Waymo)
-  - [ ] Waymo (NuScenes + SemanticKITTI + Waymo)
-- [ ] Release config and record of indoor instance segmentation;
-  - [ ] ScanNet (Scratch and Fine-tuned from PPT pre-trained PTv3)
-  - [ ] ScanNet200 (Scratch and Fine-tuned from PPT pre-trained PTv3)
-- [ ] Release config and record of ScanNet data efficient benchmark;
-- [ ] Release config and record of Waymo Object Detection benchmark;
-- [ ] Release config and record of ImageNet classification;
-  - [ ] ImageClassifier (making all 3D backbones in Pointcept support image classification)
-  - [ ] Config and Record (PTv3 + SparseUNet)
 
 ## Citation
 If you find _PTv3_ useful to your research, please cite our work as an acknowledgment. (੭ˊ꒳​ˋ)੭✧
