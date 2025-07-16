@@ -1,3 +1,9 @@
+# Point Transformer V3 - Object Detection
+
+**Acknowledge**: This code is modified from OpenPCDet with help from [Honghui Yang](https://hhyangcs.github.io/),  
+**Note**: Apology for not cleaning up the code and attaching with a nice instruction, which make it a bit messy now. I kept the git record, so that you can track the changes from the original OpenPCDet codebase.
+
+
 <img src="docs/open_mmlab.png" align="right" width="30%">
 
 # OpenPCDet
