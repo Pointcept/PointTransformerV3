@@ -72,7 +72,32 @@ feat = model.embed(coord, color, normal)     # (N, 1232) features for the N inpu
 labels = ptv3.load("ptv3_scannet").predict(coord, color, normal).argmax(1)  # ScanNet-20
 ```
 
-Inputs are numpy arrays or tensors: `coord` (N, 3) in meters, `color` (N, 3) in 0-255 and `normal` (N, 3). Concerto and Utonia take zeros for a missing color or normal. For outdoor LiDAR, use Utonia with `embed(..., scale=0.2, center=False)`. `embed` also takes lists of clouds and runs them as one batch; `ptv3.prepare`, `ptv3.collate` and `ptv3.upcast` are its steps if you need them separately. Demos: `uv run demo/0_pca.py` (also `1_similarity`, `2_sem_seg`, `3_batch`).
+Inputs are numpy arrays or tensors: `coord` (N, 3) in meters, `color` (N, 3) in 0-255 and `normal` (N, 3). Concerto and Utonia take zeros for a missing color or normal. For outdoor LiDAR, use Utonia with `embed(..., scale=0.2, center=False)`. `embed` also takes lists of clouds and runs them as one batch; `ptv3.prepare`, `ptv3.collate` and `ptv3.upcast` are its steps if you need them separately. The demos use all three.
+
+## Demo
+
+The scripts in [demo/](https://github.com/Pointcept/PointTransformerV3/tree/main/demo) are the Sonata, Concerto and Utonia demos, ported to this package. They run the pre-trained encoders on indoor scans, outdoor LiDAR, an aerial scan of Hong Kong, robot manipulation scenes, single objects and point clouds lifted from video. The scripts take `--model` (default `utonia`), `--wo_color`, `--wo_normal` and `--sample` (another pointcept/demo sample or your own .npz; the video demo takes `--input`). Each writes a PLY file and a PNG snapshot to `demo/output/`; `--show` opens an open3d viewer (`uv sync --extra demo`). The point clouds are downloaded on first use from the [pointcept/demo](https://huggingface.co/datasets/pointcept/demo) dataset.
+
+<p align="center">
+    <img alt="Utonia demos" src="https://raw.githubusercontent.com/pointcept/assets/main/utonia/demo.png" width="800"><br>
+    <img alt="Concerto outdoor demo" src="https://raw.githubusercontent.com/pointcept/assets/main/concerto/demo_outdoor.png" width="800">
+</p>
+
+Top: Utonia on an indoor scan (PCA colors, similarity to a query point, ScanNet-20 segmentation), an object, a manipulation scene, a LiDAR sweep and Hong Kong from the air. Bottom: a LiDAR sweep, and Concerto's outdoor checkpoint on it with and without color. The figures come from the Utonia and Concerto repositories. Their project pages ([Utonia](https://pointcept.github.io/Utonia/), [Concerto](https://pointcept.github.io/Concerto/)) have an interactive gallery of these clouds and recordings of the video demo.
+
+| demo | what it shows | command |
+|---|---|---|
+| `0_pca.py` | first principal components of the features as colors, indoor scan | `uv run demo/0_pca.py --model concerto_large` |
+| `1_similarity.py` | cosine similarity of a query point to a local view and to the whole scan | `uv run demo/1_similarity.py` |
+| `2_sem_seg.py` | ScanNet-20 segmentation with a linear probe (`utonia`, `concerto_large`, `sonata`) or `ptv3_scannet` | `uv run demo/2_sem_seg.py --model ptv3_scannet` |
+| `3_batch.py` | two clouds in one forward (`embed` on lists, `prepare` + `collate`) | `uv run demo/3_batch.py --rotate` |
+| `4_pca_hk.py` | aerial point cloud of Hong Kong, 40M points (1.5 GB download) | `uv run demo/4_pca_hk.py` |
+| `5_pca_manipulation.py` | a robot manipulation scene (RGB-D, no normals) | `uv run demo/5_pca_manipulation.py` |
+| `6_pca_object.py` | an object upright and on its side, in one batch | `uv run demo/6_pca_object.py` |
+| `7_pca_outdoor.py` | outdoor LiDAR, Utonia or Concerto's outdoor checkpoint | `uv run demo/7_pca_outdoor.py --model concerto_large_outdoor` |
+| `8_pca_video.py` | a cloud lifted from a video or a folder of images by VGGT | `uv run demo/8_pca_video.py --input video.mp4` |
+
+The PCA, similarity and batch demos run with every encoder preset (`sonata*`, `concerto*`, `utonia*`); demos 4 to 7 run with the Utonia presets (7 also with `concerto_large_outdoor`). `--wo_color` and `--wo_normal` replace the colors or normals with zeros, which Concerto and Utonia accept. The PCA colors do not depend on the device or a seed; with the default models they look like the figures above. The video demo needs [VGGT](https://github.com/facebookresearch/vggt), which is not a dependency of this package: install it yourself, for example `uv run --with "vggt @ git+https://github.com/facebookresearch/vggt" --with "torchvision==0.27.*" demo/8_pca_video.py --input video.mp4` (a torchvision that matches your torch).
 
 ## Model zoo
 

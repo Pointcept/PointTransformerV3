@@ -49,6 +49,35 @@ Rules that matter:
   ScanNet MIT; Sonata (Meta) CC BY-NC 4.0, non-commercial only;
   Concerto and Utonia (Pointcept) CC BY-NC 4.0 with the code's research permission.
 
+## Demos
+
+`demo/` holds the Sonata, Concerto and Utonia demos ported to this package (README "Demo").
+They run on the public API only (`load`, `prepare`, `collate`, `upcast`, `embed`, `predict`);
+per-domain settings are `prepare` arguments in the demo code, never package changes. Shared
+helpers are in `demo/_common.py` (samples from the Hugging Face dataset `pointcept/demo` at a
+pinned revision, `pca_color`, `heat_color`, PLY and PNG writers, the optional open3d viewer).
+`pca_color` is an exact PCA with a fixed sign per component, so colors do not depend on the
+device or a seed; the demos pass per-model `signs` that reproduce the originals' colors (fitted
+against the originals' own output on the same sample; other presets keep the default signs).
+
+| demo | default sample | models | settings |
+|---|---|---|---|
+| `0_pca`, `1_similarity`, `3_batch` | `sample1` (ScanNet scan) | every encoder preset (default `utonia`) | the preset's |
+| `2_sem_seg` | `sample1` | presets with a `scannet20` head | the preset's |
+| `4_pca_hk` | `sample5_hk` (40M points) | `utonia*` | `scale=0.0015` |
+| `5_pca_manipulation` | `sample4_manipulation` | `utonia*` | `scale=4` |
+| `6_pca_object` | `sample3_object` | `utonia*` | `scale=1`, normals estimated, `--normalize` |
+| `7_pca_outdoor` | `sample2_outdoor_multiframe` / `sample2_outdoor` | `utonia*`, `concerto_large_outdoor` | `scale=0.2, center=False` |
+| `8_pca_video` | a video or images, lifted by VGGT | `utonia*` (scale 1), `concerto*`, `sonata*` | `--tsdf`: open3d `VoxelBlockGrid` surface points |
+
+`concerto_large_outdoor` has no preset: the demo downloads its checkpoint at a pinned revision,
+checks its sha256, loads it with `ptv3.load("concerto_large", weights=...)` and centers x and y
+after grid sampling, as Concerto's transform does. VGGT is never a dependency or vendored;
+`8_pca_video` imports it only when the user installed it. Adapted demo code keeps its Apache-2.0
+notices (`demo/THIRD_PARTY_LICENSES.md`, NOTICE). Outputs go to `demo/output/` (ignored by git).
+Lint the demos explicitly: `uv run ruff check demo && uv run pyright demo` (pyright's default
+scope is `src/`).
+
 ## Presets
 
 One model class (`PointTransformerV3`) and one `Config` dataclass; every released model is a

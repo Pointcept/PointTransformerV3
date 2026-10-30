@@ -28,6 +28,14 @@ Some files contain third-party code under their own licenses, kept with their no
 src/pointtransformerv3/ops/sparse_conv/THIRD_PARTY_LICENSES.md (installed as
 pointtransformerv3/ops/sparse_conv/THIRD_PARTY_LICENSES.md): ocnn-pytorch and FlexGEMM, MIT.
 
+The demo scripts in demo/ (in the repository, not in the pip package) contain code adapted from
+the Utonia (https://github.com/Pointcept/Utonia) and Concerto
+(https://github.com/Pointcept/Concerto) demos, Apache License 2.0, which build on the Sonata
+demos (Copyright (c) Meta Platforms, Inc. and affiliates). The adapted parts remain under the
+Apache License 2.0; sources and the license text are in demo/THIRD_PARTY_LICENSES.md. The video
+demo uses VGGT (https://github.com/facebookresearch/vggt) only if it is installed separately; VGGT
+is not distributed with this software.
+
 Model weights
 -------------
 

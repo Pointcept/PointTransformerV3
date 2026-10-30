@@ -1,37 +1,46 @@
-"""Sonata features of a scan, colored by their first three principal components.
+"""PCA of an encoder's features on an indoor scan: the first principal components as colors.
 
-uv run demo/0_pca.py            # writes demo/output/pca.ply (add --show for a viewer)
+    uv run demo/0_pca.py                          # Utonia on the ScanNet scan sample1
+    uv run demo/0_pca.py --model concerto_large   # any encoder preset: sonata, concerto, ...
+    uv run demo/0_pca.py --wo_color --wo_normal   # coordinates only (Concerto, Utonia)
+
+Writes demo/output/pca_<model>.ply and .png; --show opens a viewer.
+
+Adapted from Utonia demo/0_pca_indoor.py and Concerto demo/0_pca.py (Apache-2.0, based on the
+Sonata demo, Copyright (c) Meta Platforms, Inc. and affiliates; see THIRD_PARTY_LICENSES.md).
+Changed: one script for every encoder preset, ptv3.prepare / upcast instead of the original
+transforms, an exact PCA (_common.pca_color) instead of the seeded low-rank one, headless output.
 """
 
 from __future__ import annotations
 
 import time
 
-import torch
-from _common import OUTPUT, args, load_sample, pca_color, show, write_ply
-
-import pointtransformerv3 as ptv3
+from _common import (
+    INDOOR_SIGNS,
+    drop_inputs,
+    features,
+    load_model,
+    load_sample,
+    parser,
+    pca_color,
+    prepare,
+    save,
+    show,
+)
 
 if __name__ == "__main__":
-    opt = args(__doc__)
-    model = ptv3.load("sonata", device=opt.device, precision=opt.precision)
-    scan = load_sample(opt.sample)
+    opt = parser(__doc__).parse_args()
+    model = load_model(opt)
+    scan = drop_inputs(load_sample(opt.sample), opt)
     t0 = time.perf_counter()
-    point, inverse = ptv3.prepare(
-        scan["coord"],
-        scan["color"],
-        scan["normal"],
-        preset="sonata",
-        device=next(model.parameters()).device,
-    )
-    with torch.inference_mode():
-        # levels=2: concatenate the three coarsest levels, then copy down (Sonata's PCA demo)
-        feat = ptv3.upcast(model(point), levels=2).feat[inverse]
+    point, inverse = prepare(model, scan)
+    feat = features(model, point)  # three coarsest levels, copied down to the grid rows
     print(
-        f"{len(scan['coord'])} points -> {len(point.feat)} grid-sampled points -> features "
-        f"{tuple(feat.shape)} in {time.perf_counter() - t0:.2f} s"
+        f"{opt.model}: {len(scan['coord'])} points -> {len(point.feat)} grid-sampled -> "
+        f"features {tuple(feat.shape)} in {time.perf_counter() - t0:.2f} s"
     )
-    rgb = pca_color(feat)
-    print("wrote", write_ply(OUTPUT / "pca.ply", scan["coord"], rgb))
+    rgb = pca_color(feat, signs=INDOOR_SIGNS.get(opt.model))[inverse.cpu().numpy()]
+    save(f"pca_{opt.model}", scan["coord"], rgb)
     if opt.show:
-        show(scan["coord"], rgb)
+        show([(scan["coord"], rgb)])
