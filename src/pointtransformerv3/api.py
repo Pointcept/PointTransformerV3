@@ -15,7 +15,7 @@ from torch import Tensor
 from pointtransformerv3.convert import ConvertError, pc_backbone_config, pc_version
 from pointtransformerv3.model import Config, PointTransformerV3, Precision, _check_precision
 from pointtransformerv3.presets import PRESETS, Preset, get_preset
-from pointtransformerv3.weights import fetch, note_license, read_checkpoint, state_dict_of
+from pointtransformerv3.weights import fetch, read_checkpoint, state_dict_of
 
 __all__ = ["load", "set_backend", "warmup"]
 
@@ -83,7 +83,6 @@ def load(
         elif preset.weights is not None:
             ckpt_path = fetch(preset.weights, revision=revision)
             info["backbone"] = _info(preset.weights, ckpt_path, revision)
-            note_license(preset.weights)
         else:
             ckpt_path = None
         if ckpt_path is not None:
@@ -123,7 +122,6 @@ def load(
             if spec.weights is not None:
                 head_path = fetch(spec.weights, revision=revision)
                 info["head"] = _info(spec.weights, head_path, revision)
-                note_license(spec.weights)
                 head_state = state_dict_of(read_checkpoint(head_path))
                 state = {k: v for k, v in state.items() if not k.startswith("seg_head.")}
                 state.update({k: v for k, v in head_state.items() if k.startswith("seg_head.")})

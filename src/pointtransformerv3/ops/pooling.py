@@ -60,6 +60,11 @@ runs on a shared GPU). The table below was measured before, with a padded-source
 0.77 for autograd's ``index_add_``). ``unpool``'s backward is a segment sum when the fine rows are
 grouped and torch's sort-based ``index_put_(accumulate=True)`` otherwise; both are deterministic,
 unlike ``index_add_`` with repeated indices.
+
+MPS has no ``segment_reduce`` (torch 2.12 falls back to the CPU, or raises without
+``PYTORCH_ENABLE_MPS_FALLBACK=1``), so on MPS ``pool`` reduces with ``scatter_reduce`` over
+``index.inverse`` (``"mean"`` as a sum divided by the child counts) and ``unpool``'s grouped
+backward with ``index_add_``.
 """
 
 from __future__ import annotations
@@ -188,8 +193,29 @@ def pool(feat: Tensor, index: PoolIndex, reduce: Reduce = "max") -> Tensor:
     if reduce not in REDUCES:
         raise ValueError(f"reduce must be one of {REDUCES}, got {reduce!r}")
     _check_rows(feat, index.num_fine, "feat", "fine")
+    if feat.device.type == "mps":
+        return _pool_scatter(feat, index, reduce)
     src = feat if index.grouped else permute_rows(feat, index.sort)
     return torch.segment_reduce(src, reduce, offsets=index.ptr, axis=0, unsafe=True)
+
+
+_SCATTER_REDUCE = {"max": "amax", "min": "amin", "sum": "sum", "mean": "sum"}
+
+
+def _pool_scatter(feat: Tensor, index: PoolIndex, reduce: Reduce) -> Tensor:
+    """``pool`` without ``segment_reduce`` (MPS): a ``scatter_reduce`` of each fine row into its
+    coarse row. Every coarse row has a child, so ``include_self=False`` leaves no initial value
+    in the result. Ties in ``"max"``/``"min"`` share the gradient evenly (``segment_reduce`` does
+    so only for positive gradients). The initial value is -inf / +inf for them: torch 2.12's
+    backward also counts an initial value equal to the result as a tie."""
+    target = index.inverse.view(-1, *(1,) * (feat.dim() - 1)).expand_as(feat)
+    fill = {"max": float("-inf"), "min": float("inf")}.get(reduce, 0.0)
+    out = feat.new_full((index.num_coarse, *feat.shape[1:]), fill)
+    out = out.scatter_reduce(0, target, feat, _SCATTER_REDUCE[reduce], include_self=False)
+    if reduce == "mean":
+        counts = index.ptr.diff().to(out.dtype)
+        out = out / counts.view(-1, *(1,) * (feat.dim() - 1))
+    return out
 
 
 def unpool(feat: Tensor, index: PoolIndex) -> Tensor:
@@ -227,7 +253,10 @@ class _Unpool(torch.autograd.Function):
     ) -> tuple[Tensor | None, None, None, None]:
         (grad,) = grad_outputs
         inverse, ptr = ctx.saved_tensors
-        if ctx.grouped:
+        if ctx.grouped and grad.device.type == "mps":  # no segment_reduce on MPS
+            out = grad.new_zeros(ctx.num_coarse, *grad.shape[1:])
+            out.index_add_(0, inverse, grad)
+        elif ctx.grouped:
             out = torch.segment_reduce(grad, "sum", offsets=ptr, axis=0, unsafe=True)
         else:  # torch sorts the indices first, so the sums are deterministic
             out = grad.new_zeros(ctx.num_coarse, *grad.shape[1:])

@@ -332,3 +332,35 @@ def test_pool_unpool_export(synthetic_pack):
     shapes = ({0: n}, {0: n}, {0: n}, {0: m + 1}, {0: m})
     program = torch.export.export(Features(), args, dynamic_shapes=shapes)
     assert torch.equal(program.module()(*args), Features()(*args))
+
+
+@pytest.mark.parametrize("grouped", [False, True])
+@pytest.mark.parametrize("reduce", ["max", "mean", "min", "sum"])
+def test_mps_scatter_path_matches_segment_reduce(reduce, grouped):
+    """``pool`` on MPS uses ``_pool_scatter`` (no ``segment_reduce`` there); run it on the CPU."""
+    from pointtransformerv3.ops.pooling import _pool_scatter
+
+    gen = torch.Generator().manual_seed(5)
+    cluster = torch.unique(torch.randint(60, (500,), generator=gen), return_inverse=True)[1]
+    if grouped:
+        cluster = cluster.sort().values
+    index = index_from_clusters(cluster)
+    if grouped:
+        index = PoolIndex(index.inverse, index.sort, index.ptr, index.head, grouped=True)
+    feat = torch.randn(500, 2, 6, generator=gen).round(decimals=1)  # ties for max / min
+    feat.requires_grad_()
+    want = pool(feat, index, reduce)
+    got = _pool_scatter(feat, index, reduce)
+    torch.testing.assert_close(got, want, rtol=1e-6, atol=1e-6)
+    grad = torch.randn(want.shape, generator=gen)
+    (g_got,) = torch.autograd.grad(got, feat, grad)
+    if reduce in ("max", "min"):  # ties share evenly (segment_reduce does so only for g > 0)
+        tie = feat.detach() == want.detach()[cluster]
+        ties = torch.zeros_like(want).index_add_(0, cluster, tie.float())
+        g_want = tie * (grad / ties)[cluster]
+    else:
+        (g_want,) = torch.autograd.grad(want, feat, grad)
+    torch.testing.assert_close(g_got, g_want, rtol=1e-6, atol=1e-6)
+    half = _pool_scatter(feat.detach().bfloat16(), index, reduce)
+    assert half.dtype == torch.bfloat16
+    torch.testing.assert_close(half.float(), want.detach(), rtol=2e-2, atol=2e-2)

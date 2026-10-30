@@ -102,8 +102,8 @@ the specialized kernels.
 
 Triton needs a C compiler and `Python.h` once per Triton version, to build its launcher (a
 uv-managed Python ships the headers). Without them, on Windows and on macOS, every op falls back
-to its torch backend and warns once naming the missing piece. MPS works through the torch paths
-(not measured here).
+to its torch backend and warns once naming the missing piece. MPS works through the torch paths;
+pooling uses `scatter_reduce` there, since MPS has no `segment_reduce` (not measured here).
 
 ## Not supported yet
 

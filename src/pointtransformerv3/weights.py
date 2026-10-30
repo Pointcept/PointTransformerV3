@@ -27,7 +27,6 @@ from pointtransformerv3.presets import WeightSource
 __all__ = ["fetch", "read_checkpoint", "sha256_of", "state_dict_of"]
 
 log = logging.getLogger(__name__)
-_LICENSE_NOTED: set[str] = set()
 
 
 def _cache_dir() -> Path:
@@ -107,30 +106,6 @@ def fetch(source: WeightSource, *, revision: str | None = None) -> Path:
             revision,
         )
     return local
-
-
-def note_license(source: WeightSource) -> None:
-    """Log the weights' license once per process (always for non-commercial ones)."""
-    if source.license in _LICENSE_NOTED:
-        return
-    _LICENSE_NOTED.add(source.license)
-    if "research permission" in source.license:  # Pointcept's weights: the code's terms
-        log.warning(
-            "%s/%s is licensed %s (NOTICE): research, evaluation and education, also in "
-            "companies; not in commercial products or services without a commercial license",
-            source.repo,
-            source.file,
-            source.license,
-        )
-    elif "NC" in source.license:
-        log.warning(
-            "%s/%s is licensed %s: non-commercial use only (the code license is separate)",
-            source.repo,
-            source.file,
-            source.license,
-        )
-    else:
-        log.info("%s/%s is licensed %s", source.repo, source.file, source.license)
 
 
 def read_checkpoint(path: str | Path) -> dict[str, Any]:
