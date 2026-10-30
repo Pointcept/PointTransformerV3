@@ -1,0 +1,42 @@
+pointtransformerv3
+Copyright (c) 2026 Pointcept (https://github.com/Pointcept)
+
+pointtransformerv3 is licensed under the Creative Commons Attribution-NonCommercial 4.0
+International License (CC BY-NC 4.0; see LICENSE), with the additional permission stated here.
+
+Additional permission
+---------------------
+
+In addition to the rights granted by CC BY-NC 4.0, the licensor (Pointcept) grants this
+permission: use, reproduction and adaptation of the software for research, evaluation and
+education by any person or organization, including for-profit companies, is permitted and is
+treated as NonCommercial use, provided the software and its adaptations are not used in or
+distributed with a product or service offered for commercial advantage or monetary compensation.
+Attribution under Section 3 of CC BY-NC 4.0 still applies.
+
+Commercial use
+--------------
+
+Any use outside the permissions above (for example, in a product or service offered for
+commercial advantage or monetary compensation) requires a separate commercial license from the
+licensor (Pointcept). Contact: xiaoyang.wu.cs@gmail.com
+
+Third-party code
+----------------
+
+Some files contain third-party code under their own licenses, kept with their notices in
+src/pointtransformerv3/ops/sparse_conv/THIRD_PARTY_LICENSES.md (installed as
+pointtransformerv3/ops/sparse_conv/THIRD_PARTY_LICENSES.md): ocnn-pytorch and FlexGEMM, MIT.
+
+Model weights
+-------------
+
+Model weights are licensed separately from the code. They are downloaded from Hugging Face at
+runtime and are not distributed with this software:
+
+- PTv3 ScanNet weights (Pointcept/PointTransformerV3), owned by Pointcept: MIT.
+- Sonata weights (facebook/sonata), owned by Meta: CC BY-NC 4.0. The additional permission above
+  does not apply to them.
+- Concerto weights (Pointcept/Concerto) and Utonia weights (Pointcept/Utonia), owned by
+  Pointcept: CC BY-NC 4.0 with the additional permission above (read "the software" as "the
+  weights") and the same commercial-use terms and contact.

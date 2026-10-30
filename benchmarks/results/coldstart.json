@@ -1,0 +1,33 @@
+{
+ "cold triton cache, warmup": {
+  "import_s": 0.785133881996444,
+  "load_s": 0.4524901900003897,
+  "warmup_s": 4.982883160999336,
+  "first_ms": 36.74359000433469,
+  "steady_ms": 27.96157100237906
+ },
+ "warm triton cache, warmup": {
+  "import_s": 0.7217964570008917,
+  "load_s": 0.42884413999854587,
+  "warmup_s": 1.5769804269948509,
+  "first_ms": 36.31059399776859,
+  "steady_ms": 34.14200300176162
+ },
+ "warm triton cache, no warmup": {
+  "import_s": 0.7430242160044145,
+  "load_s": 0.3951621829983196,
+  "warmup_s": 0.0,
+  "first_ms": 1295.44683900167,
+  "steady_ms": 35.736521997023374
+ },
+ "original (18c09ff), no warm-up": {
+  "import_s": 5.634595938005077,
+  "load_s": 1.3272579599943128,
+  "first_ms": 509.2138390027685,
+  "steady_ms": 86.74283199798083
+ },
+ "import_process_s": {
+  "new": 0.9485312329998123,
+  "orig": 5.9198650649996125
+ }
+}

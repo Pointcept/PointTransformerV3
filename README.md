@@ -1,40 +1,132 @@
-# Point Transformer V3
-This repo is the official project repository of the paper **_Point Transformer V3: Simpler, Faster, Stronger_** and is mainly used for releasing schedules, updating instructions, sharing experiment records (containing model weight), and handling issues. The code will be updated in _[Pointcept](https://github.com/Pointcept/Pointcept) v1.5_.  
-[ Backbone ] [PTv3] - [ [arXiv](https://arxiv.org/abs/2312.10035) ] [ [Bib](https://xywu.me/research/ptv3/bib.txt) ] [ [Code](https://github.com/Pointcept/Pointcept) ]  
+<p align="center">
+    <!-- pypi-strip -->
+    <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Pointcept/PointTransformerV3/main/assets/teaser.png">
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Pointcept/PointTransformerV3/main/assets/teaser.png">
+    <!-- /pypi-strip -->
+    <img alt="pointtransformerv3" src="https://raw.githubusercontent.com/Pointcept/PointTransformerV3/main/assets/teaser.png" width="800">
+    <!-- pypi-strip -->
+    </picture><br>
+    <!-- /pypi-strip -->
+</p>
 
-<div align='left'>
-<img src="assets/teaser.png" alt="teaser" width="800" />
-</div>
+This repo is the official project repository of the paper **Point Transformer V3: Simpler, Faster, Stronger**.  
+IEEE Conference on Computer Vision and Pattern Recognition (**CVPR**) 2024 - Oral  
+[ Backbone ] [PTv3] - [ [arXiv](https://arxiv.org/abs/2312.10035) ] [ [Bib](https://xywu.me/research/ptv3/bib.txt) ] [ [Weight](https://huggingface.co/Pointcept/PointTransformerV3) ]
 
-## Sonata: Self-supervised pre-trained PTv3
-🚀 Check out our latest powerful self-supervised pre-trained PTv3, [Sonata](https://github.com/facebookresearch/sonata), which includes various visual demos with our pre-trained PTv3.
+It is also a pip package, `pointtransformerv3`: PTv3 in plain PyTorch, with Triton kernels on the GPU. Besides PTv3, it runs the released weights of the pre-training works built on PTv3:
 
-<div align='left'>
-<img src="https://raw.githubusercontent.com/pointcept/assets/main/sonata/demo.png" alt="teaser" width="800" />
-</div>
+- **Sonata: Self-Supervised Learning of Reliable Point Representations**  
+IEEE Conference on Computer Vision and Pattern Recognition (**CVPR**) 2025 - Highlight  
+[ Pretrain ] [Sonata] - [ [Project](https://xywu.me/sonata/) ] [ [arXiv](https://arxiv.org/abs/2503.16429) ] [ [Bib](https://xywu.me/research/sonata/bib.txt) ] [ [Weight](https://huggingface.co/facebook/sonata) ]
+
+- **Concerto: Joint 2D-3D Self-Supervised Learning Emerges Spatial Representations**  
+Conference on Neural Information Processing Systems (**NeurIPS**) 2025  
+[ Pretrain ] [Concerto] - [ [Project](https://pointcept.github.io/Concerto/) ] [ [arXiv](https://arxiv.org/abs/2510.23607) ] [ [Bib](https://xywu.me/research/concerto/bib.txt) ] [ [Weight](https://huggingface.co/Pointcept/Concerto) ]
+
+- **Utonia: Toward One Encoder for All Point Clouds**  
+International Conference on Machine Learning (**ICML**) 2026  
+[ Pretrain ] [Utonia] - [ [Project](https://pointcept.github.io/Utonia/) ] [ [arXiv](https://arxiv.org/abs/2603.03283) ] [ [Bib](https://pointcept.github.io/Utonia/#citation) ] [ [Weight](https://huggingface.co/Pointcept/Utonia) ]
 
 ## Highlights
-- *Apr 05, 2024*: PTv3 is selected as one of the 90 **Oral** presentations (3.3% accepted paper, 0.78% submissions) by CVPR'24!
-- *Feb 28, 2024*: PTv3 is accepted by CVPR'24 🎉🎉🎉. 
-- *Dec 31, 2023*: We released the model code of PTv3, experiment records for scratched ScanNet and ScanNet200 are now available. More will be available soon.
-- *Dec 19, 2023*: We released our project repo for PTv3, if you have any questions related to our work, please feel free to open an issue. Subscribe to our updates by filling out the [form](https://forms.gle/jHoBNqfhqK94WG678) and the subscription can be canceled by editing the form.
 
+- *Oct 2026*: PTv3 is now a pip package, `pointtransformerv3`, with optimizations from Pointcept2, our next codebase. It needs no spconv or FlashAttention (plain PyTorch with Triton kernels), runs 1.7-4.7x faster with 18-31% less memory on the GPU, also runs on the CPU, and loads the Sonata, Concerto and Utonia weights. See [docs/acceleration.md](https://github.com/Pointcept/PointTransformerV3/blob/main/docs/acceleration.md).
+- *Apr 2024*: PTv3 is selected as one of the 90 Oral presentations of CVPR'24.
+- *Feb 2024*: PTv3 is accepted by CVPR'24.
+- *Dec 2023*: We released the model code of PTv3 and the experiment records for ScanNet and ScanNet200.
 
-## Overview
-- [Citation](#citation)
-- [Installation](#installation)
-- [Data Preparation](#data-preparation)
-- [Quick Start](#quick-start)
-- [Model Zoo](#model-zoo)
+## Speed
+
+This release is a technical pre-release of Pointcept2: its PTv3 optimizations, packaged on their own. The classic single-file implementation stays on the [legacy](https://github.com/Pointcept/PointTransformerV3/tree/legacy) branch.
+
+| model | ScanNet 150k | ScanNet 298k | ScanNet++ 1.13M | peak memory |
+|---|---|---|---|---|
+| PTv3 | 53 → 31 ms (1.7x) | 71 → 31 ms (2.3x) | 201 → 46 ms (4.4x) | -25 to -31% |
+| Sonata | 87 → 35 ms (2.5x) | 112 → 35 ms (3.2x) | 271 → 58 ms (4.7x) | -28 to -30% |
+| Concerto large | 101 → 35 ms (2.9x) | 139 → 38 ms (3.7x) | 337 → 76 ms (4.4x) | -29 to -31% |
+| Utonia | 108 → 44 ms (2.5x) | 153 → 42 ms (3.6x) | 419 → 118 ms (3.5x) | -18 to -19% |
+
+Forward time of the original code → this package, median on one RTX PRO 6000 with the same grid-sampled inputs. Each side runs its default: the originals in fp32 with fp16 FlashAttention (Utonia: bf16), this package with fp16 autocast. More in [docs/benchmark.md](https://github.com/Pointcept/PointTransformerV3/blob/main/docs/benchmark.md).
+
+## Install
+
+```bash
+pip install pointtransformerv3     # needs torch >= 2.10; install torch first for another CUDA build
+uv add pointtransformerv3          # in a uv project
+```
+
+From source, with [uv](https://docs.astral.sh/uv/):
+
+```bash
+git clone https://github.com/Pointcept/PointTransformerV3 && cd PointTransformerV3
+uv sync                            # Python 3.12, torch with CUDA 13 on Linux; --extra cu126 or --extra cpu
+```
+
+## Get features
+
+```python
+import pointtransformerv3 as ptv3
+
+model = ptv3.load("sonata")                  # downloads the weights once; fp16 on CUDA
+feat = model.embed(coord, color, normal)     # (N, 1232) features for the N input points
+labels = ptv3.load("ptv3_scannet").predict(coord, color, normal).argmax(1)  # ScanNet-20
+```
+
+Inputs are numpy arrays or tensors: `coord` (N, 3) in meters, `color` (N, 3) in 0-255 and `normal` (N, 3). Concerto and Utonia take zeros for a missing color or normal. For outdoor LiDAR, use Utonia with `embed(..., scale=0.2, center=False)`. `embed` also takes lists of clouds and runs them as one batch; `ptv3.prepare`, `ptv3.collate` and `ptv3.upcast` are its steps if you need them separately. Demos: `uv run demo/0_pca.py` (also `1_similarity`, `2_sem_seg`, `3_batch`).
+
+## Model zoo
+
+| preset | params | weights | license |
+|---|---|---|---|
+| `ptv3_scannet` | 46.2M | [Pointcept/PointTransformerV3](https://huggingface.co/Pointcept/PointTransformerV3) | MIT |
+| `sonata` | 108.5M | [facebook/sonata](https://huggingface.co/facebook/sonata) | CC BY-NC 4.0 (Meta) |
+| `sonata_small` | 38.6M | [facebook/sonata](https://huggingface.co/facebook/sonata) | CC BY-NC 4.0 (Meta) |
+| `concerto`, `concerto_siglip`, `concerto_origin` | 108.5M | [Pointcept/Concerto](https://huggingface.co/Pointcept/Concerto) | CC BY-NC 4.0 + permission |
+| `concerto_large` | 207.7M | [Pointcept/Concerto](https://huggingface.co/Pointcept/Concerto) | CC BY-NC 4.0 + permission |
+| `utonia` | 137.3M | [Pointcept/Utonia](https://huggingface.co/Pointcept/Utonia) | CC BY-NC 4.0 + permission |
+| `utonia_small`, `utonia_tiny` | 37.2M, 9.3M | [Pointcept/Utonia](https://huggingface.co/Pointcept/Utonia) | CC BY-NC 4.0 + permission |
+| `ptv3` | 46.2M | random init, for training | - |
+
+`sonata`, `concerto_large` and `utonia` come with a ScanNet-20 linear probe: `ptv3.load("sonata", head="scannet20")`. `concerto_origin` is the model from the Concerto paper; `concerto` and `concerto_large` are the default checkpoints on its Hugging Face page. Weights are downloaded on first use. For agreement with the original code, see [docs/parity.md](https://github.com/Pointcept/PointTransformerV3/blob/main/docs/parity.md).
+
+The old single-file `model.py` is on the [legacy](https://github.com/Pointcept/PointTransformerV3/tree/legacy) branch. `ptv3.PointTransformerV3` takes its arguments (except RPE and PDNorm) and loads its checkpoints. Training configs and experiment records are in [Pointcept](https://github.com/Pointcept/Pointcept).
+
+## License
+
+The code is released under CC BY-NC 4.0 with an additional permission for research use: see [LICENSE](https://github.com/Pointcept/PointTransformerV3/blob/main/LICENSE) and [NOTICE](https://github.com/Pointcept/PointTransformerV3/blob/main/NOTICE).  
+Model weights have their own licenses, listed in [NOTICE](https://github.com/Pointcept/PointTransformerV3/blob/main/NOTICE).
 
 ## Citation
-If you find _PTv3_ useful to your research, please cite our work as an acknowledgment. (੭ˊ꒳​ˋ)੭✧
+
+If you find _PTv3_ useful to your research, please cite our work as an acknowledgment.
+
 ```bib
 @inproceedings{wu2024ptv3,
     title={Point Transformer V3: Simpler, Faster, Stronger},
     author={Wu, Xiaoyang and Jiang, Li and Wang, Peng-Shuai and Liu, Zhijian and Liu, Xihui and Qiao, Yu and Ouyang, Wanli and He, Tong and Zhao, Hengshuang},
     booktitle={CVPR},
     year={2024}
+}
+
+@inproceedings{wu2025sonata,
+    title={Sonata: Self-Supervised Learning of Reliable Point Representations},
+    author={Wu, Xiaoyang and DeTone, Daniel and Frost, Duncan and Shen, Tianwei and Xie, Chris and Yang, Nan and Engel, Jakob and Newcombe, Richard and Zhao, Hengshuang and Straub, Julian},
+    booktitle={CVPR},
+    year={2025}
+}
+
+@inproceedings{zhang2025concerto,
+    title={Concerto: Joint 2D-3D Self-Supervised Learning Emerges Spatial Representations},
+    author={Zhang, Yujia and Wu, Xiaoyang and Lao, Yixing and Wang, Chengyao and Tian, Zhuotao and Wang, Naiyan and Zhao, Hengshuang},
+    booktitle={NeurIPS},
+    year={2025}
+}
+
+@inproceedings{zhang2026utonia,
+    title={Utonia: Toward One Encoder for All Point Clouds},
+    author={Zhang, Yujia and Wu, Xiaoyang and Yang, Yunhan and Fan, Xianzhe and Li, Han and Zhang, Yuechen and Huang, Zehao and Wang, Naiyan and Zhao, Hengshuang},
+    booktitle={ICML},
+    year={2026}
 }
 
 @inproceedings{wu2024ppt,
@@ -57,156 +149,4 @@ If you find _PTv3_ useful to your research, please cite our work as an acknowled
     howpublished={\url{https://github.com/Pointcept/Pointcept}},
     year={2023}
 }
-```
-
-## Installation
-
-### Requirements
- PTv3 relies on FlashAttention, while FlashAttention relies on the following requirement, make sure your local Pointcept environment satisfies the requirements:
-
-(Recommendation)
-- Ubuntu: 20.04 and above
-- CUDA: 11.6 and above
-- PyTorch: 1.12.0 and above
-
-If you can not upgrade your local environment to satisfy the above-recommended requirements, the following requirement is the minimum to run PTv3 with Pointcept, and you need to disable Flash Attention to enable PTv3:
-
-(Minimum)
-- Ubuntu: 18.04 and above
-- CUDA: 11.3 and above
-- PyTorch: 1.10.0 and above
-
-### Environment
-
-- Base environment
-```bash
-conda create -n pointcept python=3.8 -y
-conda activate pointcept
-conda install ninja -y
-# Choose version you want here: https://pytorch.org/get-started/previous-versions/
-# We use CUDA 11.8 and PyTorch 2.1.0 for our development of PTv3
-conda install pytorch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 pytorch-cuda=11.8 -c pytorch -c nvidia
-conda install h5py pyyaml -c anaconda -y
-conda install sharedarray tensorboard tensorboardx yapf addict einops scipy plyfile termcolor timm -c conda-forge -y
-conda install pytorch-cluster pytorch-scatter pytorch-sparse -c pyg -y
-pip install torch-geometric
-
-cd libs/pointops
-python setup.py install
-cd ../..
-
-# spconv (SparseUNet)
-# refer https://github.com/traveller59/spconv
-pip install spconv-cu118  # choose version match your local cuda version
-
-# Open3D (visualization, optional)
-pip install open3d
-```
-
-- Flash Attention
-
-Following [README](https://github.com/Dao-AILab/flash-attention?tab=readme-ov-file#installation-and-features) in Flash Attention repo and install Flash Attention for PTv3. This installation is optional, but we recommend enabling Flash Attention for PTv3.
-
-
-## Data Preparation
-Please further refer Pointcept readme [Data Preparation](https://github.com/Pointcept/Pointcept#data-preparation) section.
-
-## Quick Start
-### Two running scenarios
-We provide two running scenarios for PTv3, Pointcept-driven and custom-framework-driven. For the former one, you only need to clone the code of Pointcept to your local and follow the [Quick Start](https://github.com/Pointcept/Pointcept#quick-start) in Pointcept to run PTv3:
-```bash
-git clone https://github.com/Pointcept/Pointcept.git
-sh scripts/train.sh -p ${INTERPRETER_PATH} -g ${NUM_GPU} -d ${DATASET_NAME} -c ${CONFIG_NAME} -n ${EXP_NAME}
-```
-For the latter scenario, we offer a distinct instance of PTv3, disassociated from our Pointcept framework. To incorporate this code into your project, clone the project repo and copy the following file/folder to your project:
-```bash
-git clone https://github.com/Pointcept/PointTransformerV3.git
-cp model.py ${PATH_TO_YOUR_PROJECT}
-cp -r serialization ${PATH_TO_YOUR_PROJECT}
-```
-Align the input dictionary defined in our [model](https://github.com/Pointcept/PointTransformerV3/blob/main/model.py#L968) file and the model will return the encoded feature of the given batch point cloud.
-
-### Flash Attention
-The full PTv3 relies on Flash Attention, while Flash Attention relies on CUDA 11.6 and above, make sure your local Pointcept environment satisfies the requirements.
-
-If you can not upgrade your local environment to satisfy the requirements (CUDA >= 11.6), then you can disable FlashAttention by setting the model parameter `enable_flash` to `false` and reducing the `enc_patch_size` and `dec_patch_size` to a level (e.g. 128).
-
-FlashAttention force disables RPE and forces the accuracy reduced to fp16. If you require these features, please disable `enable_flash` and adjust `enable_rpe`, `upcast_attention` and`upcast_softmax`.
-
-
-## Model Zoo
-### 1. Indoor semantic segmentation
-| Model | Benchmark | Additional Data | Num GPUs | Val mIoU | Config | Tensorboard | Exp Record |
-| :---: | :---: |:---------------:| :---: | :---: | :---: | :---: | :---: |
-| PTv3 | ScanNet |     &cross;     | 4 | 77.6% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/scannet/semseg-pt-v3m1-0-base.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/scannet-semseg-pt-v3m1-0-base) |
-| PTv3 + PPT | ScanNet |     &check;     | 8 | 78.5% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/scannet/semseg-pt-v3m1-1-ppt-extreme.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/scannet-semseg-pt-v3m1-1-ppt-extreme) |
-| PTv3 | ScanNet200 |     &cross;     | 4 | 35.3% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/scannet200/semseg-pt-v3m1-0-base.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) |[link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/scannet200-semseg-pt-v3m1-0-base)|
-| PTv3 + PPT | ScanNet200 | &check; (f.t.)  | 4 |  |  |  |  |
-| PTv3 | S3DIS (Area5) |     &cross;     | 4 | 73.6% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/s3dis/semseg-pt-v3m1-0-rpe.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/s3dis-semseg-pt-v3m1-0-rpe) |
-| PTv3 + PPT | S3DIS (Area5) |     &check;     | 8 | 75.4% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/s3dis/semseg-pt-v3m1-1-ppt-extreme.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/s3dis-semseg-pt-v3m1-1-ppt-extreme) |
-
-_**\*Released model weights are temporarily invalid as the model structure of PTv3 is adjusted.**_
-
-Example running scripts are as follows:
-```bash
-# Scratched ScanNet
-sh scripts/train.sh -g 4 -d scannet -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
-# PPT joint training (ScanNet + Structured3D) and evaluate in ScanNet
-sh scripts/train.sh -g 8 -d scannet -c semseg-pt-v3m1-1-ppt-extreme -n semseg-pt-v3m1-1-ppt-extreme
-
-# Scratched ScanNet200
-sh scripts/train.sh -g 4 -d scannet200 -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
-# Fine-tuning from  PPT joint training (ScanNet + Structured3D) with ScanNet200
-# TODO
-
-# Scratched S3DIS, S3DIS rely on RPE, also an example for disable flash attention
-sh scripts/train.sh -g 4 -d s3dis -c semseg-pt-v3m1-0-rpe -n semseg-pt-v3m1-0-rpe
-# PPT joint training (ScanNet + S3DIS + Structured3D) and evaluate in ScanNet
-sh scripts/train.sh -g 8 -d s3dis -c semseg-pt-v3m1-1-ppt-extreme -n semseg-pt-v3m1-1-ppt-extreme
-
-# More configs and exp records for PTv3 will be available soon.
-```
-
-### 2.Outdoor semantic segmentation
-| Model | Benchmark | Additional Data | Num GPUs | Val mIoU | Config | Tensorboard | Exp Record |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| PTv3 | nuScenes | &cross; | 4 | 80.3 | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/nuscenes/semseg-pt-v3m1-0-base.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard)|[link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/nuscenes-semseg-pt-v3m1-0-base) |
-| PTv3 + PPT | nuScenes | &check; | 8 | | | | |
-| PTv3 | SemanticKITTI | &cross; | 4 | | | | |
-| PTv3 + PPT | SemanticKITTI | &check; | 8 | | | | |
-| PTv3 | Waymo | &cross; | 4 | 71.2 | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/waymo/semseg-pt-v3m1-0-base.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/waymo-semseg-pt-v3m1-0-base) (log only) |
-| PTv3 + PPT | Waymo | &check; | 8 | | | | |
-
-_**\*Released model weights are temporarily invalid as the model structure of PTv3 is adjusted.**_  
-_**\*Model weights trained with Waymo Open Dataset cannot be released due to the regulations.**_
-
-Example running scripts are as follows:
-```bash
-# Scratched ScanNet
-sh scripts/train.sh -g 4 -d scannet -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
-# PPT joint training (ScanNet + Structured3D) and evaluate in ScanNet
-sh scripts/train.sh -g 8 -d scannet -c semseg-pt-v3m1-1-ppt-extreme -n semseg-pt-v3m1-1-ppt-extreme
-
-# Scratched ScanNet200
-sh scripts/train.sh -g 4 -d scannet200 -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
-# Fine-tuning from  PPT joint training (ScanNet + Structured3D) with ScanNet200
-# TODO
-
-# Scratched S3DIS, S3DIS rely on RPE, also an example for disable flash attention
-sh scripts/train.sh -g 4 -d s3dis -c semseg-pt-v3m1-0-rpe -n semseg-pt-v3m1-0-rpe
-# PPT joint training (ScanNet + S3DIS + Structured3D) and evaluate in ScanNet
-sh scripts/train.sh -g 8 -d s3dis -c semseg-pt-v3m1-1-ppt-extreme -n semseg-pt-v3m1-1-ppt-extreme
-# S3DIS 6-fold cross validation
-# 1. The default configs are evaluated on Area_5, modify the "data.train.split", "data.val.split", and "data.test.split" to make the config evaluated on Area_1 ~ Area_6 respectively.
-# 2. Train and evaluate the model on each split of areas and gather result files located in "exp/s3dis/EXP_NAME/result/Area_x.pth" in one single folder, noted as RECORD_FOLDER.
-# 3. Run the following script to get S3DIS 6-fold cross validation performance:
-export PYTHONPATH=./
-python tools/test_s3dis_6fold.py --record_root ${RECORD_FOLDER}
-
-# Scratched nuScenes
-sh scripts/train.sh -g 4 -d nuscenes -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
-# Scratched Waymo
-sh scripts/train.sh -g 4 -d waymo -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
-
-# More configs and exp records for PTv3 will be available soon.
 ```

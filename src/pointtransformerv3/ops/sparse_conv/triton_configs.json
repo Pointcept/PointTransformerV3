@@ -1,0 +1,52 @@
+{
+ "about": "Pinned launch configs of the triton sparse conv backend (ops/sparse_conv/triton_impl.py). gpus: key '<device name>|sm_<major><minor>|<SM count>'; configs: key '<kind>:<C_in>:<C_out>:<k**3>:<dtype>', kind fwd / dgrad (GEMM tile B1 x B2, BK reduction step) or wgrad (B1 x B2 tile, BK rows per step, SPLITK row splits). Shapes or GPUs not listed use the generic configs in triton_impl.py. Never autotuned at runtime.",
+ "gpus": {
+  "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|sm_120|188": {
+   "measured": "research/sparse_conv/triton/sweep.py (offline sweep, 1M-token ScanNet pack, bf16 fwd+bwd), 2026-10-29, torch 2.12.1+cu130, Triton 3.7.1; float16 entries copy the bfloat16 winners. 2026-10-30 (accel R4(b)): wgrad C256 / C512 at 4 warps instead of 8 (the sweep never tried a 128x128 tile at 4 warps): same bits, 0.62 -> 0.44 / 0.61 -> 0.43 ms per call at 1M, bf16 and fp16 (research/accel/integrate_a/wgrad_r4b.py)",
+   "configs": {
+    "dgrad:128:128:27:bfloat16": {"B1": 128, "B2": 64, "BK": 64, "num_warps": 4, "num_stages": 2},
+    "dgrad:128:128:27:float16": {"B1": 128, "B2": 64, "BK": 64, "num_warps": 4, "num_stages": 2},
+    "dgrad:256:256:27:bfloat16": {"B1": 128, "B2": 64, "BK": 64, "num_warps": 4, "num_stages": 2},
+    "dgrad:256:256:27:float16": {"B1": 128, "B2": 64, "BK": 64, "num_warps": 4, "num_stages": 2},
+    "dgrad:32:32:27:bfloat16": {"B1": 128, "B2": 32, "BK": 32, "num_warps": 4, "num_stages": 4},
+    "dgrad:32:32:27:float16": {"B1": 128, "B2": 32, "BK": 32, "num_warps": 4, "num_stages": 4},
+    "dgrad:48:48:27:bfloat16": {"B1": 128, "B2": 64, "BK": 64, "num_warps": 4, "num_stages": 4},
+    "dgrad:48:48:27:float16": {"B1": 128, "B2": 64, "BK": 64, "num_warps": 4, "num_stages": 4},
+    "dgrad:512:512:27:bfloat16": {"B1": 128, "B2": 64, "BK": 64, "num_warps": 4, "num_stages": 2},
+    "dgrad:512:512:27:float16": {"B1": 128, "B2": 64, "BK": 64, "num_warps": 4, "num_stages": 2},
+    "dgrad:64:64:27:bfloat16": {"B1": 128, "B2": 64, "BK": 64, "num_warps": 4, "num_stages": 2},
+    "dgrad:64:64:27:float16": {"B1": 128, "B2": 64, "BK": 64, "num_warps": 4, "num_stages": 2},
+    "dgrad:6:32:125:bfloat16": {"B1": 128, "B2": 32, "BK": 32, "num_warps": 8, "num_stages": 2},
+    "dgrad:6:32:125:float16": {"B1": 128, "B2": 32, "BK": 32, "num_warps": 8, "num_stages": 2},
+    "fwd:128:128:27:bfloat16": {"B1": 128, "B2": 64, "BK": 64, "num_warps": 4, "num_stages": 2},
+    "fwd:128:128:27:float16": {"B1": 128, "B2": 64, "BK": 64, "num_warps": 4, "num_stages": 2},
+    "fwd:256:256:27:bfloat16": {"B1": 64, "B2": 128, "BK": 64, "num_warps": 4, "num_stages": 4},
+    "fwd:256:256:27:float16": {"B1": 64, "B2": 128, "BK": 64, "num_warps": 4, "num_stages": 4},
+    "fwd:32:32:27:bfloat16": {"B1": 128, "B2": 32, "BK": 32, "num_warps": 4, "num_stages": 3},
+    "fwd:32:32:27:float16": {"B1": 128, "B2": 32, "BK": 32, "num_warps": 4, "num_stages": 3},
+    "fwd:48:48:27:bfloat16": {"B1": 128, "B2": 64, "BK": 64, "num_warps": 4, "num_stages": 3},
+    "fwd:48:48:27:float16": {"B1": 128, "B2": 64, "BK": 64, "num_warps": 4, "num_stages": 3},
+    "fwd:512:512:27:bfloat16": {"B1": 64, "B2": 128, "BK": 64, "num_warps": 4, "num_stages": 3},
+    "fwd:512:512:27:float16": {"B1": 64, "B2": 128, "BK": 64, "num_warps": 4, "num_stages": 3},
+    "fwd:64:64:27:bfloat16": {"B1": 128, "B2": 64, "BK": 64, "num_warps": 4, "num_stages": 3},
+    "fwd:64:64:27:float16": {"B1": 128, "B2": 64, "BK": 64, "num_warps": 4, "num_stages": 3},
+    "fwd:6:32:125:bfloat16": {"B1": 128, "B2": 32, "BK": 16, "num_warps": 8, "num_stages": 2},
+    "fwd:6:32:125:float16": {"B1": 128, "B2": 32, "BK": 16, "num_warps": 8, "num_stages": 2},
+    "wgrad:128:128:27:bfloat16": {"B1": 128, "B2": 64, "BK": 64, "SPLITK": 27, "num_warps": 4, "num_stages": 2},
+    "wgrad:128:128:27:float16": {"B1": 128, "B2": 64, "BK": 64, "SPLITK": 27, "num_warps": 4, "num_stages": 2},
+    "wgrad:256:256:27:bfloat16": {"B1": 128, "B2": 128, "BK": 64, "SPLITK": 13, "num_warps": 4, "num_stages": 3},
+    "wgrad:256:256:27:float16": {"B1": 128, "B2": 128, "BK": 64, "SPLITK": 13, "num_warps": 4, "num_stages": 3},
+    "wgrad:32:32:27:bfloat16": {"B1": 32, "B2": 128, "BK": 64, "SPLITK": 107, "num_warps": 4, "num_stages": 4},
+    "wgrad:32:32:27:float16": {"B1": 32, "B2": 128, "BK": 64, "SPLITK": 107, "num_warps": 4, "num_stages": 4},
+    "wgrad:48:48:27:bfloat16": {"B1": 64, "B2": 128, "BK": 64, "SPLITK": 107, "num_warps": 4, "num_stages": 2},
+    "wgrad:48:48:27:float16": {"B1": 64, "B2": 128, "BK": 64, "SPLITK": 107, "num_warps": 4, "num_stages": 2},
+    "wgrad:512:512:27:bfloat16": {"B1": 128, "B2": 128, "BK": 64, "SPLITK": 3, "num_warps": 4, "num_stages": 3},
+    "wgrad:512:512:27:float16": {"B1": 128, "B2": 128, "BK": 64, "SPLITK": 3, "num_warps": 4, "num_stages": 3},
+    "wgrad:64:64:27:bfloat16": {"B1": 64, "B2": 128, "BK": 64, "SPLITK": 107, "num_warps": 4, "num_stages": 2},
+    "wgrad:64:64:27:float16": {"B1": 64, "B2": 128, "BK": 64, "SPLITK": 107, "num_warps": 4, "num_stages": 2},
+    "wgrad:6:32:125:bfloat16": {"B1": 32, "B2": 128, "BK": 64, "SPLITK": 188, "num_warps": 4, "num_stages": 2},
+    "wgrad:6:32:125:float16": {"B1": 32, "B2": 128, "BK": 64, "SPLITK": 188, "num_warps": 4, "num_stages": 2}
+   }
+  }
+ }
+}
