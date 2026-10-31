@@ -1,4 +1,4 @@
-"""Model inputs of the PTv3 parity cases (P1, P2), made once with ``pointtransformerv3.prepare``
+"""Model inputs of the PTv3 parity cases (P1, P2), made once with ``point_transformer_v3.prepare``
 (preset ``ptv3_scannet``, pick "first") so both implementations read identical tensors.
 
 usage (this package's env, CPU; needs PTV3_PARITY_RAW): python -m tests.parity.make_inputs
@@ -9,7 +9,7 @@ from __future__ import annotations
 import numpy as np
 import torch
 
-import pointtransformerv3 as ptv3
+import point_transformer_v3 as ptv3
 from tests.parity.common import INPUTS, SCENES, env_path
 
 

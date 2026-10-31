@@ -27,10 +27,10 @@ from pathlib import Path
 import pytest
 import torch
 
-from pointtransformerv3.layers.sparse_conv import SubMConv3d
-from pointtransformerv3.ops import _triton
-from pointtransformerv3.ops.neighbors import build_kmap, check_kmap
-from pointtransformerv3.ops.sparse_conv import (
+from point_transformer_v3.layers.sparse_conv import SubMConv3d
+from point_transformer_v3.ops import _triton
+from point_transformer_v3.ops.neighbors import build_kmap, check_kmap
+from point_transformer_v3.ops.sparse_conv import (
     functional,
     get_backend,
     set_backend,
@@ -415,13 +415,13 @@ def test_input_validation():
 
 @pytest.mark.skipif(importlib.util.find_spec("triton") is None, reason="triton is not installed")
 def test_op_checks_bias():
-    """A direct ``torch.ops.pointtransformerv3.subm_conv3d`` call is checked too (before any launch)."""
+    """A direct ``torch.ops.point_transformer_v3.subm_conv3d`` call is checked too (before any launch)."""
     triton_impl._load_ops()
     x, weight = torch.randn(10, 4), torch.randn(6, 27, 4)
     kmap = torch.full((10, 27), -1, dtype=torch.int32)
     for bias in (torch.zeros(7), torch.zeros(6, dtype=torch.int64), torch.zeros(1)):
         with pytest.raises(ValueError, match=r"bias must be a float \(6,\) tensor on cpu"):
-            torch.ops.pointtransformerv3.subm_conv3d(x, weight, bias, kmap)
+            torch.ops.point_transformer_v3.subm_conv3d(x, weight, bias, kmap)
 
 
 # ---------------------------------------------------------------- CUDA
@@ -611,7 +611,7 @@ def test_eager_function_is_the_op_bitwise(
 def test_wgrad_warps_keep_the_bits(triton_cuda, synthetic_pack, monkeypatch, dtype, c):
     """R4(b): the pinned C256 / C512 weight-gradient configs run at 4 warps (8 before); tile, BK
     and split fix the reduction order, so the gradient is the same bit for bit."""
-    from pointtransformerv3.ops.sparse_conv import _triton_ops
+    from point_transformer_v3.ops.sparse_conv import _triton_ops
 
     grid = make_grid(synthetic_pack, [2500, 900], 16, seed=c)
     kmap = grid.kmap(3)
@@ -628,7 +628,7 @@ def test_wgrad_warps_keep_the_bits(triton_cuda, synthetic_pack, monkeypatch, dty
 @pytest.mark.gpu
 def test_export_keeps_the_op(triton_cuda, synthetic_pack):
     """D15 after I5: non-strict torch.export (FakeTensors) and strict export (dynamo) both record
-    ``pointtransformerv3.subm_conv3d``, and the exported program computes what eager does."""
+    ``point_transformer_v3.subm_conv3d``, and the exported program computes what eager does."""
     grid = make_grid(synthetic_pack, [1500, 700], 14, seed=4)
     kmap = grid.kmap(3)
     weight, bias = random_params(16, 16, 3)
@@ -648,7 +648,7 @@ def test_export_keeps_the_op(triton_cuda, synthetic_pack):
             for n in module.graph.nodes
             if n.op == "call_function"
         }
-        assert "pointtransformerv3.subm_conv3d.default" in targets, (strict, targets)
+        assert "point_transformer_v3.subm_conv3d.default" in targets, (strict, targets)
         assert torch.equal(exported.module()(x, kmap), expected)
 
 

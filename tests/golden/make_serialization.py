@@ -21,7 +21,7 @@ from types import ModuleType
 import numpy as np
 import torch
 
-from pointtransformerv3.ops.serialization import MAX_DEPTH, ORDERS
+from point_transformer_v3.ops.serialization import MAX_DEPTH, ORDERS
 from tests.ops.test_serialization import (
     FULL_DEPTHS,
     GOLDEN,

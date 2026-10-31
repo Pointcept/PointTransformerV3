@@ -1,12 +1,12 @@
 # Presets: one model class, many released configurations
 
-`pointtransformerv3` has one model class, `PointTransformerV3`, and one `Config` dataclass. Every
+`point_transformer_v3` has one model class, `PointTransformerV3`, and one `Config` dataclass. Every
 released model (PTv3, Sonata, Concerto, Utonia) is a **preset**: a complete `Config`
 plus where its weights come from, how raw points are prepared for it and which heads exist.
 Later works become Config options of the same class, never new model classes. This keeps one
 code path to test, accelerate and maintain.
 
-## What a preset holds (`src/pointtransformerv3/presets.py`)
+## What a preset holds (`src/point_transformer_v3/presets.py`)
 
 ```python
 Preset(

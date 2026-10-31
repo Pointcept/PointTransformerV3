@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 import torch
 
-from pointtransformerv3.ops.grid_sample import (
+from point_transformer_v3.ops.grid_sample import (
     GridSampled,
     _segment_bounds,
     grid_sample,

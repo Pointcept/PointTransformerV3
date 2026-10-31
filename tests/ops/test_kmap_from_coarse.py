@@ -25,9 +25,9 @@ from pathlib import Path
 import pytest
 import torch
 
-from pointtransformerv3.ops import neighbors
-from pointtransformerv3.ops.keys import pack_keys, unpack_keys
-from pointtransformerv3.ops.neighbors import build_kmap, kmap_from_coarse
+from point_transformer_v3.ops import neighbors
+from point_transformer_v3.ops.keys import pack_keys, unpack_keys
+from point_transformer_v3.ops.neighbors import build_kmap, kmap_from_coarse
 from tests.conftest import DEVICES, cell_grid, edge_case_pack, regroup
 from tests.ops.test_kmap import brute_kmap
 
@@ -114,10 +114,10 @@ REPO = Path(__file__).resolve().parents[2]
 
 def triton_kmap(coarse_kmap, inverse, grid, k, path="eager"):
     """The Triton path on ``grid``'s device (CPU = interpreter): the eager launcher or the op."""
-    from pointtransformerv3.ops import _neighbors_triton
+    from point_transformer_v3.ops import _neighbors_triton
 
     if path == "op":
-        return torch.ops.pointtransformerv3.kmap_from_coarse(coarse_kmap, inverse, grid, k)
+        return torch.ops.point_transformer_v3.kmap_from_coarse(coarse_kmap, inverse, grid, k)
     return _neighbors_triton.launch(coarse_kmap, inverse, grid, k)
 
 
@@ -148,7 +148,7 @@ def corrupt_cases(grid, batch, near_only):
 
 
 def bad_op_calls(coarse_kmap, inverse, grid):
-    """(name, op arguments, error, message) of direct ``pointtransformerv3::kmap_from_coarse`` calls the
+    """(name, op arguments, error, message) of direct ``point_transformer_v3::kmap_from_coarse`` calls the
     op body and the fake impl must reject: launched, each would index past the coarse map, the
     child table or a short input."""
     m, n = coarse_kmap.shape[0], grid.shape[0]
@@ -172,7 +172,7 @@ def bad_op_calls(coarse_kmap, inverse, grid):
 def check_op_rejects_bad_calls() -> bool:
     """Interpreter: every ``bad_op_calls`` case raises its error before a launch (without the
     checks, the interpreter would run the kernels on them)."""
-    from pointtransformerv3.ops import _neighbors_triton  # noqa: F401  (registers the op)
+    from point_transformer_v3.ops import _neighbors_triton  # noqa: F401  (registers the op)
 
     grid, batch = CASES["random samples"]
     coarse_grid, coarse_batch, inverse = coarse_level(grid, batch)
@@ -180,7 +180,7 @@ def check_op_rejects_bad_calls() -> bool:
     for name, args, error, message in bad_op_calls(build_kmap(coarse_grid, coarse_batch, 3),
                                                    inverse, grid):  # fmt: skip
         try:
-            torch.ops.pointtransformerv3.kmap_from_coarse(*args)
+            torch.ops.point_transformer_v3.kmap_from_coarse(*args)
             good, got = False, "no error"
         except error as e:
             good, got = re.search(message, str(e)) is not None, str(e)
@@ -237,27 +237,27 @@ def test_triton_kernels_in_interpreter():
 
 @pytest.mark.skipif(importlib.util.find_spec("triton") is None, reason="triton is not installed")
 def test_op_checks_inputs():
-    """A direct ``torch.ops.pointtransformerv3.kmap_from_coarse`` call is checked before any launch (CPU
+    """A direct ``torch.ops.point_transformer_v3.kmap_from_coarse`` call is checked before any launch (CPU
     tensors, so no kernel could run), and so is its fake impl (FakeTensorMode: tracing and
     export), which still gives the ``(N, K)`` int32 shape of valid inputs."""
     from torch._subclasses.fake_tensor import FakeTensorMode
 
-    from pointtransformerv3.ops import _neighbors_triton  # noqa: F401  (registers the op)
+    from point_transformer_v3.ops import _neighbors_triton  # noqa: F401  (registers the op)
 
     grid, batch = CASES["random samples"]
     coarse_grid, coarse_batch, inverse = coarse_level(grid, batch)
     coarse_kmap = build_kmap(coarse_grid, coarse_batch, 3)
     for name, args, error, message in bad_op_calls(coarse_kmap, inverse, grid):
         with pytest.raises(error, match=message):
-            torch.ops.pointtransformerv3.kmap_from_coarse(*args)
+            torch.ops.point_transformer_v3.kmap_from_coarse(*args)
             pytest.fail(name)
     with FakeTensorMode() as mode:
         fake = [mode.from_tensor(t) for t in (coarse_kmap, inverse, grid)]
-        out = torch.ops.pointtransformerv3.kmap_from_coarse(*fake, 5)
+        out = torch.ops.point_transformer_v3.kmap_from_coarse(*fake, 5)
         assert out.shape == (len(grid), 125) and out.dtype == torch.int32
         for name, args, error, message in bad_op_calls(*fake):
             with pytest.raises(error, match=message):
-                torch.ops.pointtransformerv3.kmap_from_coarse(*args)
+                torch.ops.point_transformer_v3.kmap_from_coarse(*args)
                 pytest.fail(f"fake: {name}")
 
 
@@ -265,7 +265,7 @@ def test_op_checks_inputs():
 def test_triton_on_cuda():
     """The Triton path on CUDA: equal to build_kmap through both call paths, and to the torch
     path bit for bit; near out-of-range inputs stay inside the tensors."""
-    from pointtransformerv3.ops.sparse_conv import triton_impl
+    from point_transformer_v3.ops.sparse_conv import triton_impl
 
     if not triton_impl.available(min_capability=triton_impl.TRITON_MIN_CAPABILITY):
         pytest.skip("triton unavailable")
@@ -296,7 +296,7 @@ def test_triton_compile_and_export():
     for strict in (False, True):
         exported = torch.export.export(FromCoarse(), inputs, strict=strict)
         targets = {str(n.target) for n in exported.graph.nodes if n.op == "call_function"}
-        assert "pointtransformerv3.kmap_from_coarse.default" in targets, (strict, targets)
+        assert "point_transformer_v3.kmap_from_coarse.default" in targets, (strict, targets)
         assert torch.equal(exported.module()(*inputs), expected)
     torch._dynamo.reset()
     patch = {  # fx_graph_cache off: see tests/ops/test_norm_ops.py

@@ -1,5 +1,6 @@
 # Publish to PyPI on a version tag (v*) with Trusted Publishing: no API token is stored. On PyPI the
-# project's trusted publisher is this repository, workflow publish.yml, environment pypi.
+# project's trusted publisher is this repository, workflow publish.yml, environment pypi. Before
+# the first release of a project name, register that publisher on PyPI as a pending publisher.
 name: publish
 
 on:
@@ -35,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/pointtransformerv3
+      url: https://pypi.org/p/point-transformer-v3
     permissions:
       id-token: write  # Trusted Publishing (OIDC)
     steps:

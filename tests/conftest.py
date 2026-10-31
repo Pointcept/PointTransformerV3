@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     import torch
     from torch import Tensor
 
-    from pointtransformerv3.structure import PointGrid
+    from point_transformer_v3.structure import PointGrid
 
 # Several agents and CI jobs share the 32 cores: cap intra-op threads unless the caller set them.
 # Must run before torch/numpy are imported (they read these at start-up).
@@ -137,7 +137,7 @@ def scannet_scene(request: pytest.FixtureRequest) -> Callable[..., dict[str, np.
 
 def point_grid(pack: SyntheticPack, depth: int = 15, **kwargs: Any) -> PointGrid:
     """Level 0 ``PointGrid`` of a synthetic pack."""
-    from pointtransformerv3.structure import PointGrid
+    from point_transformer_v3.structure import PointGrid
 
     return PointGrid(
         coord=pack.coord,
@@ -153,8 +153,8 @@ def point_grid(pack: SyntheticPack, depth: int = 15, **kwargs: Any) -> PointGrid
 def cell_grid(grid_coord: Tensor, seq_lens: Sequence[int], depth: int = 16) -> PointGrid:
     """Level 0 ``PointGrid`` of bare grid cells (rows sample-contiguous, ``coord`` at the cell
     centers of a 0.02 m lattice): the ``SparseGrid`` of conv tests and benchmarks."""
-    from pointtransformerv3.ops.seqlens import cu_seqlens_of
-    from pointtransformerv3.structure import PointGrid
+    from point_transformer_v3.ops.seqlens import cu_seqlens_of
+    from point_transformer_v3.structure import PointGrid
 
     seq_lens = tuple(int(n) for n in seq_lens)
     return PointGrid(

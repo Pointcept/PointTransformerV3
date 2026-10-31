@@ -28,8 +28,8 @@ import pytest
 import torch
 import torch.nn.functional as F
 
-from pointtransformerv3.ops import norm as ln_module
-from pointtransformerv3.ops.norm import layer_norm, set_layer_norm_backend
+from point_transformer_v3.ops import norm as ln_module
+from point_transformer_v3.ops.norm import layer_norm, set_layer_norm_backend
 
 REPO = Path(__file__).resolve().parents[2]
 EPS = 1e-5
@@ -75,9 +75,9 @@ def rel(a: torch.Tensor, b: torch.Tensor) -> float:
 
 def run(n, c, dtype=torch.float32, device="cpu", path="eager", out_dtype=None) -> bool:
     """One case through the Triton launchers (``path``: "eager" = ``LayerNormFunction``, "op" =
-    ``torch.ops.pointtransformerv3.layer_norm``); prints one line. Features in ``dtype``, fp32 weight and
+    ``torch.ops.point_transformer_v3.layer_norm``); prints one line. Features in ``dtype``, fp32 weight and
     bias, output in ``out_dtype`` (default ``dtype``)."""
-    from pointtransformerv3.ops import _norm_triton
+    from point_transformer_v3.ops import _norm_triton
 
     out_dtype = out_dtype or dtype
     x, grad, weight, bias = make(n, c, seed=n * 7 + c)
@@ -89,7 +89,7 @@ def run(n, c, dtype=torch.float32, device="cpu", path="eager", out_dtype=None) -
     if path == "eager":
         out = _norm_triton.LayerNormFunction.apply(*args)
     else:
-        out = torch.ops.pointtransformerv3.layer_norm(*args)[0]
+        out = torch.ops.point_transformer_v3.layer_norm(*args)[0]
     grads = torch.autograd.grad(out, (x_in, w_in, b_in), grad.to(device))
     tol_out, tol_wb = TOLERANCES[out_dtype if out_dtype != torch.float32 else dtype]
     errs = {"out": rel(out, expected[0]), "dx": rel(grads[0], expected[1])}
@@ -179,7 +179,7 @@ def test_fp64_and_other_shapes_take_torch():
 
 @pytest.fixture
 def triton_cuda() -> None:
-    from pointtransformerv3.ops.sparse_conv import triton_impl
+    from point_transformer_v3.ops.sparse_conv import triton_impl
 
     problem = triton_impl.toolchain_problem(min_capability=triton_impl.TRITON_MIN_CAPABILITY)
     if problem is not None:
@@ -283,7 +283,7 @@ def test_packing_invariance_and_shapes(triton_cuda):
 @pytest.mark.gpu
 def test_compile_and_export_keep_the_op(triton_cuda):
     """D15: torch.compile (fullgraph, dynamic rows, compile-time autotune off) matches eager, and
-    strict / non-strict torch.export record ``pointtransformerv3.layer_norm``."""
+    strict / non-strict torch.export record ``point_transformer_v3.layer_norm``."""
     import torch._inductor.config as inductor_config
 
     x, grad, weight, bias = ptv3_rows(3000, 64, torch.bfloat16, seed=6)
@@ -321,7 +321,7 @@ def test_compile_and_export_keep_the_op(triton_cuda):
     for strict in (False, True):
         exported = torch.export.export(Norm(), (x,), strict=strict)
         targets = {str(n.target) for n in exported.graph.nodes if n.op == "call_function"}
-        assert "pointtransformerv3.layer_norm.default" in targets, (strict, targets)
+        assert "point_transformer_v3.layer_norm.default" in targets, (strict, targets)
         assert torch.equal(exported.module()(x), fn(x))
 
 

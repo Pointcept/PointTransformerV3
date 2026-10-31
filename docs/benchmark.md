@@ -10,17 +10,17 @@ under WSL2, 2026-10-30. Script: `benchmarks/bench.py`; raw results: `benchmarks/
   ScanNet scenes of the batch cases).
 - `PTV3_BENCH_ORIG_PYTHON`: the python of an environment with the originals' dependencies (torch,
   spconv, torch_scatter, flash_attn, timm, addict).
-- `PTV3_PARITY_ROOT` (optional, default `~/.cache/pointtransformerv3/parity`): where
+- `PTV3_PARITY_ROOT` (optional, default `~/.cache/point_transformer_v3/parity`): where
   `tests/parity/dump_original.py` extracted the original code (`code/`), which the `orig` worker
-  imports; `PTV3_BENCH_CACHE` (optional, default `~/.cache/pointtransformerv3/bench`): the prepared
-  inputs (`bench.py inputs`).
+  imports; `PTV3_BENCH_CACHE` (optional, default `~/.cache/point_transformer_v3/bench`): the
+  prepared inputs (`bench.py inputs`).
 The Sonata checkpoints and demo scan are read from `~/.cache/sonata`, where the Sonata package
 downloads them.
 
 **Setup.**
 - Original: this repository's `model.py` at 3229e9b (PTv3, with the released ScanNet weights) and
   Sonata at 18c09ff, in torch 2.9.1 + CUDA 12.8, spconv 2.3.8, flash_attn 2.8.3. New:
-  `pointtransformerv3`, torch 2.12.1 + CUDA 13.0, Triton 3.7.1. The torch versions differ, so part
+  `point-transformer-v3`, torch 2.12.1 + CUDA 13.0, Triton 3.7.1. The torch versions differ, so part
   of every gap is torch itself.
 - Two persistent worker processes, one per environment, take turns on every cell; both get the
   identical grid-sampled inputs (`ptv3.prepare`, 2 cm). Times are CUDA events around
@@ -119,7 +119,7 @@ first real forward after `load`; "steady" the best of the next three.
 | new, warm Triton cache, warm-up on | 0.7 s | 0.43 s | 1.6 s | 36 ms | 34 ms |
 | new, warm Triton cache, `warmup=False` | 0.7 s | 0.40 s | - | 1295 ms | 36 ms |
 
-`import pointtransformerv3, torch` in a new process takes 0.95 s (`import sonata`: 5.9 s). Loading
+`import point_transformer_v3, torch` in a new process takes 0.95 s (`import sonata`: 5.9 s). Loading
 memory-maps the checkpoint and converts it on the meta-built model; the sha256 is checked once per
 file and remembered. The warm-up compiles every Triton kernel variant the model needs (row counts
 are not specialized, see docs/acceleration.md), so the first real input runs at steady-state

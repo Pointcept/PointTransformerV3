@@ -11,8 +11,8 @@ import pytest
 import torch
 import torch.nn.functional as F
 
-from pointtransformerv3.ops import attention
-from pointtransformerv3.ops.attention import (
+from point_transformer_v3.ops import attention
+from point_transformer_v3.ops.attention import (
     get_attention_backend,
     set_attention_backend,
     varlen_attention,

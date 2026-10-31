@@ -1,7 +1,7 @@
 """Dump the ORIGINAL implementations' outputs for the parity checks (P1-P4).
 
 Runs in the original environment (torch 2.9.1, spconv, torch_scatter, flash_attn, timm, addict,
-huggingface_hub), never imports pointtransformerv3, and reads the original code from git (this
+huggingface_hub), never imports point_transformer_v3, and reads the original code from git (this
 repository's ``model.py`` + ``serialization/`` at 3229e9b, Sonata at 18c09ff from
 ``$PTV3_PARITY_SONATA_REPO``, Utonia at be53e4a from ``$PTV3_PARITY_UTONIA_REPO``) into
 ``$ROOT/code``:
@@ -9,7 +9,7 @@ repository's ``model.py`` + ``serialization/`` at 3229e9b, Sonata at 18c09ff fro
     flock /tmp/pointcept2-gpu.lock env PYTHONDONTWRITEBYTECODE=1 \\
         <original env>/bin/python -B tests/parity/dump_original.py [steps]
 
-Outputs under ``$ROOT`` (``$PTV3_PARITY_ROOT``, default ``~/.cache/pointtransformerv3/parity``):
+Outputs under ``$ROOT`` (``$PTV3_PARITY_ROOT``, default ``~/.cache/point_transformer_v3/parity``):
 
 - ``inputs/sonata_<case>.pt``: Sonata's ``transform.default()`` on the raw scenes (numpy seeds
   fixed), collated like Sonata's demo 3 for ``batch3`` (P3 and P4 inputs).

@@ -7,11 +7,11 @@ import re
 import pytest
 import torch
 
-import pointtransformerv3 as ptv3
-from pointtransformerv3.convert import RULES, ConvertError
-from pointtransformerv3.model import Config, PointTransformerV3
-from pointtransformerv3.presets import PC_M1, PRESETS
-from pointtransformerv3.structure import auto_depth
+import point_transformer_v3 as ptv3
+from point_transformer_v3.convert import RULES, ConvertError
+from point_transformer_v3.model import Config, PointTransformerV3
+from point_transformer_v3.presets import PC_M1, PRESETS
+from point_transformer_v3.structure import auto_depth
 
 TINY = dict(
     enc_depths=(1, 1, 1, 1, 1),

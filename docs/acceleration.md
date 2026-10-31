@@ -10,7 +10,7 @@ the slow parts; each op chooses its backend per call and logs the choice once.
 | LayerNorm | `triton` (fp32 statistics, output in the activation dtype) -> `torch` | `PTV3_LAYER_NORM_BACKEND` |
 
 ```python
-import pointtransformerv3 as ptv3
+import point_transformer_v3 as ptv3
 ptv3.set_backend(attention="sdpa", conv="torch", layer_norm="torch")   # e.g. the exact fp32 path
 ```
 
@@ -66,7 +66,7 @@ input, fresh processes, `benchmarks/bench.py coldstart`, docs/benchmark.md):
 
 | step | what happens | time |
 |---|---|---|
-| `import pointtransformerv3, torch` | torch only; triton and huggingface_hub are imported on first use | 0.7-0.95 s (original: 5.6-5.9 s) |
+| `import point_transformer_v3, torch` | torch only; triton and huggingface_hub are imported on first use | 0.7-0.95 s (original: 5.6-5.9 s) |
 | `ptv3.load("sonata")`, weights cached | build on the meta device, memory-map the checkpoint, convert its keys, assign, move to the device; the sha256 is checked once per file and remembered | 0.4 s (original: 1.3 s) |
 | warm-up (default on CUDA) | forwards on synthetic clouds of 4096, 4100, 40000 and 40004 grid-sampled points: Triton compiles or loads every kernel variant, cuBLAS initializes; then one `embed` on a synthetic raw scan of 600k points (about 260k grid cells): the preprocessing ops run once and the caching allocator grows to a scan's size | 5.0 s with an empty Triton cache, 1.3-2.2 s with a warm one |
 | first real forward | | 37 ms after warm-up (steady 28-34 ms); 1.3 s without warm-up; original: 509 ms (steady 87 ms) |

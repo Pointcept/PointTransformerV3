@@ -5,16 +5,16 @@ from __future__ import annotations
 import pytest
 import torch
 
-import pointtransformerv3 as ptv3
-from pointtransformerv3.convert import (
+import point_transformer_v3 as ptv3
+from point_transformer_v3.convert import (
     ConvertError,
     convert_state_dict,
     pc_backbone_config,
     pc_version,
 )
-from pointtransformerv3.model import Config
-from pointtransformerv3.modules import Rope3d, SerializedAttention
-from pointtransformerv3.presets import UTONIA
+from point_transformer_v3.model import Config
+from point_transformer_v3.modules import Rope3d, SerializedAttention
+from point_transformer_v3.presets import UTONIA
 from tests.test_model import cloud, small
 
 # head_dim 18 at every stage (Utonia's), tiny widths

@@ -11,8 +11,8 @@ import pytest
 import torch
 from torch import nn
 
-from pointtransformerv3.ops.attention import varlen_attention
-from pointtransformerv3.ops.patches import PatchLayout, build_patches
+from point_transformer_v3.ops.attention import varlen_attention
+from point_transformer_v3.ops.patches import PatchLayout, build_patches
 from tests.conftest import DEVICES
 
 

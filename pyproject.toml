@@ -3,8 +3,8 @@ requires = ["hatchling>=1.27"]  # PEP 639 license expression and license-files
 build-backend = "hatchling.build"
 
 [project]
-name = "pointtransformerv3"
-version = "0.1.0"
+name = "point-transformer-v3"
+version = "0.1.1"
 description = "Point Transformer V3 in pure PyTorch and Triton: runs the PTv3, Sonata, Concerto and Utonia weights."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -56,10 +56,10 @@ Issues = "https://github.com/Pointcept/PointTransformerV3/issues"
 
 [tool.hatch.build.targets.wheel]
 # ships the package data too: ops/sparse_conv/THIRD_PARTY_LICENSES.md and triton_configs.json
-packages = ["src/pointtransformerv3"]
+packages = ["src/point_transformer_v3"]
 
 [tool.hatch.build.targets.sdist]
-include = ["/src/pointtransformerv3", "/README.md", "/LICENSE", "/NOTICE"]
+include = ["/src/point_transformer_v3", "/README.md", "/LICENSE", "/NOTICE"]
 
 [tool.uv]
 # uv-managed CPython only: it ships Python.h, which Triton needs once to build its CUDA launcher
@@ -99,7 +99,7 @@ select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF", "TID251"]
 ignore = ["E501"]  # vendored docstrings keep their wrapping
 
 [tool.ruff.lint.isort]
-known-first-party = ["pointtransformerv3", "tests"]
+known-first-party = ["point_transformer_v3", "tests"]
 
 [tool.ruff.lint.per-file-ignores]
 # the parity dump runs in the original environment: it imports the original code, never this package
@@ -107,11 +107,11 @@ known-first-party = ["pointtransformerv3", "tests"]
 "demo/*.py" = ["E402"]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
-"addict".msg = "use pointtransformerv3.Point"
-"timm".msg = "use pointtransformerv3.layers"
-"torch_scatter".msg = "use pointtransformerv3.ops.pooling"
-"spconv".msg = "use pointtransformerv3.ops.sparse_conv"
-"flash_attn".msg = "use pointtransformerv3.ops.attention"
+"addict".msg = "use point_transformer_v3.Point"
+"timm".msg = "use point_transformer_v3.layers"
+"torch_scatter".msg = "use point_transformer_v3.ops.pooling"
+"spconv".msg = "use point_transformer_v3.ops.sparse_conv"
+"flash_attn".msg = "use point_transformer_v3.ops.attention"
 "pointcept2".msg = "vendor the code instead (this package is standalone)"
 
 [tool.pyright]

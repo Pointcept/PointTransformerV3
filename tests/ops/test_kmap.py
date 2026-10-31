@@ -8,7 +8,7 @@ import itertools
 import pytest
 import torch
 
-from pointtransformerv3.ops.neighbors import build_kmap, kernel_offsets
+from point_transformer_v3.ops.neighbors import build_kmap, kernel_offsets
 from tests.conftest import edge_case_pack, scannet_pack
 
 

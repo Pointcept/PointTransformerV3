@@ -23,11 +23,11 @@ import torch
 import torch.nn.functional as F
 from torch import Tensor
 
-import pointtransformerv3 as ptv3
-from pointtransformerv3.convert import map_name
-from pointtransformerv3.model import Config
-from pointtransformerv3.ops.serialization import serialize
-from pointtransformerv3.presets import PC_M1_RELEASE
+import point_transformer_v3 as ptv3
+from point_transformer_v3.convert import map_name
+from point_transformer_v3.model import Config
+from point_transformer_v3.ops.serialization import serialize
+from point_transformer_v3.presets import PC_M1_RELEASE
 from tests.parity.common import INPUTS, ORIG, ROOT, SAMPLE1, SCENES, UTONIA_CASES, env_path
 
 REPORT: dict[str, Any] = {}
@@ -239,7 +239,7 @@ def p1(grads_only: bool = False) -> None:
 
 
 def p2() -> None:
-    from pointtransformerv3.convert import load_pc_checkpoint
+    from point_transformer_v3.convert import load_pc_checkpoint
     from tests.parity.common import PTV3_RELEASE
 
     state = load_pc_checkpoint(PTV3_RELEASE)["state_dict"]

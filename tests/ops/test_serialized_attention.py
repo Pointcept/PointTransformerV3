@@ -31,15 +31,15 @@ import torch
 import torch.nn.functional as F
 from torch import Tensor, nn
 
-from pointtransformerv3.ops import attention
-from pointtransformerv3.ops.attention import (
+from point_transformer_v3.ops import attention
+from point_transformer_v3.ops.attention import (
     get_attention_backend,
     serialized_attention,
     set_attention_backend,
     varlen_attention,
 )
-from pointtransformerv3.ops.gather import gather_rows, permute_rows
-from pointtransformerv3.ops.patches import PatchLayout, build_patches
+from point_transformer_v3.ops.gather import gather_rows, permute_rows
+from point_transformer_v3.ops.patches import PatchLayout, build_patches
 
 REPO = Path(__file__).resolve().parents[2]
 # (sample sizes, patch size, tail): overlap and shrink tails, an empty sample, samples shorter
@@ -104,7 +104,7 @@ def rel(a: Tensor, b: Tensor) -> float:
 
 def run_case(seq_lens, k, tail, heads, dim, dtype, device, path, configs=None) -> bool:
     """One case through ``path`` ("eager" Function or "op"); prints one line, returns ok."""
-    from pointtransformerv3.ops import _attention_triton as kernels
+    from point_transformer_v3.ops import _attention_triton as kernels
 
     saved = kernels._FWD, kernels._DQ, kernels._DKDV
     if configs is not None:
@@ -118,7 +118,7 @@ def run_case(seq_lens, k, tail, heads, dim, dtype, device, path, configs=None) -
         if path == "eager":
             out = kernels.SerializedAttentionFunction.apply(*args)
         else:
-            out = torch.ops.pointtransformerv3.serialized_attention(*args)[0]
+            out = torch.ops.point_transformer_v3.serialized_attention(*args)[0]
         (dx,) = torch.autograd.grad(out, x, grad)
     finally:
         kernels._FWD, kernels._DQ, kernels._DKDV = saved
@@ -138,7 +138,7 @@ def run_case(seq_lens, k, tail, heads, dim, dtype, device, path, configs=None) -
 
 
 def small_configs():
-    from pointtransformerv3.ops._attention_triton import LaunchConfig
+    from point_transformer_v3.ops._attention_triton import LaunchConfig
 
     small = LaunchConfig(16, 16, 4, 1)
     return small, small, small
@@ -360,7 +360,7 @@ def test_empty_level_keeps_the_graph():
 
 @pytest.fixture
 def triton_cuda() -> None:
-    from pointtransformerv3.ops._triton import MIN_CAPABILITY, toolchain_problem
+    from point_transformer_v3.ops._triton import MIN_CAPABILITY, toolchain_problem
 
     if not torch.cuda.is_available():
         pytest.skip("needs CUDA")
@@ -391,14 +391,14 @@ def test_tiny_cuda_against_fp64(triton_cuda, dtype):
 
 def d16_step(qkv: Tensor, grad: Tensor, order: Tensor, layout: PatchLayout, heads: int,
              path: str = "eager") -> tuple[Tensor, Tensor]:  # fmt: skip
-    from pointtransformerv3.ops import _attention_triton as kernels
+    from point_transformer_v3.ops import _attention_triton as kernels
 
     x = qkv.clone().requires_grad_()
     args = (x, order, layout.table, layout.max_q, heads, (qkv.shape[1] // 3 // heads) ** -0.5)
     if path == "eager":
         out = kernels.SerializedAttentionFunction.apply(*args)
     else:
-        out = torch.ops.pointtransformerv3.serialized_attention(*args)[0]
+        out = torch.ops.point_transformer_v3.serialized_attention(*args)[0]
     (dx,) = torch.autograd.grad(out, x, grad)
     return out, dx
 
@@ -452,7 +452,7 @@ def cosine(a: Tensor, b: Tensor) -> float:
 def test_auto_takes_triton_d16_close_to_varlen(triton_cuda, tail, caplog):
     """Under bf16 autocast ``auto`` takes triton_d16 (logged once); outputs and the gradients of
     x and the qkv weight agree with the varlen path to bf16 rounding (D29)."""
-    from pointtransformerv3.ops import _attention_triton as kernels
+    from point_transformer_v3.ops import _attention_triton as kernels
 
     x, qkv, order, inverse, layout = inputs((5000, 3100, 900, 2048), 1024, tail, 4, 16, "cuda")
     grad = torch.randn(x.shape[0], 64, device="cuda")
@@ -600,7 +600,7 @@ class AttentionBlock(nn.Module):
 def test_compile_and_export_keep_the_op(triton_cuda):
     """D15: torch.compile (fullgraph, dynamic rows, compile-time autotune off) of an attention
     block matches eager bit for bit, forward and backward, on two levels; strict and non-strict
-    torch.export record ``pointtransformerv3.serialized_attention`` and match eager."""
+    torch.export record ``point_transformer_v3.serialized_attention`` and match eager."""
     import torch._inductor.config as inductor_config
 
     torch.manual_seed(0)
@@ -653,7 +653,7 @@ def test_compile_and_export_keep_the_op(triton_cuda):
         for strict in (False, True):
             exported = torch.export.export(Exported(), (x, order, inverse, *tensors), strict=strict)
             targets = {str(n.target) for n in exported.graph.nodes if n.op == "call_function"}
-            assert "pointtransformerv3.serialized_attention.default" in targets, (strict, targets)
+            assert "point_transformer_v3.serialized_attention.default" in targets, (strict, targets)
             assert torch.equal(exported.module()(x, order, inverse, *tensors), want)
         # strict export with unbounded dynamic sizes: no size check may add a guard on T
         t, tk, p1 = (torch.export.Dim(n, min=2) for n in ("T", "Tk", "P1"))

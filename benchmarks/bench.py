@@ -3,7 +3,7 @@
 Two persistent workers, one per environment, take turns on every request (no process ever
 times both versions back to back): ``new`` (this package, its ``.venv``) and ``orig`` (the
 original ``model.py`` at 3229e9b and Sonata at 18c09ff, in an environment with spconv,
-torch_scatter and flash_attn). Inputs are prepared once with ``pointtransformerv3.prepare`` and
+torch_scatter and flash_attn). Inputs are prepared once with ``point_transformer_v3.prepare`` and
 fed to both as identical tensors. GPU times are CUDA events around ``model(point)``: 3 warm-up
 and 10 timed forwards per cell (two rounds of 5), median; peak memory is
 ``max_memory_allocated`` minus the allocation before the forward (weights not included; they
@@ -17,7 +17,7 @@ are reported separately).
 Environment (docs/benchmark.md): ``PTV3_BENCH_RAW``, a directory of raw scans ``<case>.npz``
 (coord, color, normal: ScanNet ``sn_*``, ScanNet++ ``pp_*``); ``PTV3_BENCH_ORIG_PYTHON``, the
 python of the original environment; ``PTV3_BENCH_CACHE`` (default
-``~/.cache/pointtransformerv3/bench``) for the prepared inputs. The original code is the one
+``~/.cache/point_transformer_v3/bench``) for the prepared inputs. The original code is the one
 ``tests/parity/dump_original.py`` extracted under ``$PTV3_PARITY_ROOT/code``.
 
 Results go to ``benchmarks/results/<what>.json`` and a table on stdout. Modes: ``default`` (ours:
@@ -39,8 +39,8 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CACHE = Path(os.environ.get("PTV3_BENCH_CACHE", "~/.cache/pointtransformerv3/bench")).expanduser()
-PARITY_ROOT = os.environ.get("PTV3_PARITY_ROOT", "~/.cache/pointtransformerv3/parity")
+CACHE = Path(os.environ.get("PTV3_BENCH_CACHE", "~/.cache/point_transformer_v3/bench")).expanduser()
+PARITY_ROOT = os.environ.get("PTV3_PARITY_ROOT", "~/.cache/point_transformer_v3/parity")
 CODE = Path(PARITY_ROOT).expanduser() / "code"  # extracted by tests/parity/dump_original.py
 SINGLE = ("sn_50k", "sn_150k", "sn_max", "pp_430k", "pp_1100k")
 BATCHES = {"sn_batch4": 4, "sn_batch8": 8}
@@ -81,7 +81,7 @@ def make_inputs() -> None:
     import numpy as np
     import torch
 
-    import pointtransformerv3 as ptv3
+    import point_transformer_v3 as ptv3
 
     CACHE.mkdir(parents=True, exist_ok=True)
 
@@ -230,7 +230,7 @@ def _e2e(impl: str, model, req: dict, device) -> dict:
         torch.cuda.synchronize()
         t0 = time.perf_counter()
         if impl == "new":
-            import pointtransformerv3 as ptv3
+            import point_transformer_v3 as ptv3
 
             point, inverse = ptv3.prepare(
                 data["coord"], data["color"], data["normal"], preset="sonata", device=device
@@ -285,7 +285,7 @@ def _build(impl: str, name: str, mode: str, device):
     import torch
 
     if impl == "new":
-        import pointtransformerv3 as ptv3
+        import point_transformer_v3 as ptv3
 
         return ptv3.load(name, device=device, warmup=False, head=False)
     sys.path[:0] = [str(CODE), str(CODE / "sonata_orig")]
@@ -444,7 +444,7 @@ def coldstart() -> dict:
     probe = r"""
 import json, os, sys, time
 t0 = time.perf_counter()
-import pointtransformerv3 as ptv3
+import point_transformer_v3 as ptv3
 import torch
 t1 = time.perf_counter()
 warm = sys.argv[1] == "1"
@@ -514,7 +514,7 @@ print(json.dumps({"import_s": t1 - t0, "load_s": t2 - t1, "warmup_s": w, "first_
     print("original", results["original (18c09ff), no warm-up"], flush=True)
     imports = {}
     for impl, cmd in (
-        ("new", [sys.executable, "-c", "import pointtransformerv3, torch"]),
+        ("new", [sys.executable, "-c", "import point_transformer_v3, torch"]),
         (
             "orig",
             [

@@ -1,7 +1,7 @@
-pointtransformerv3
+point-transformer-v3
 Copyright (c) 2026 Pointcept (https://github.com/Pointcept)
 
-pointtransformerv3 is licensed under the Creative Commons Attribution-NonCommercial 4.0
+point-transformer-v3 is licensed under the Creative Commons Attribution-NonCommercial 4.0
 International License (CC BY-NC 4.0; see LICENSE), with the additional permission stated here.
 
 Additional permission
@@ -25,8 +25,8 @@ Third-party code
 ----------------
 
 Some files contain third-party code under their own licenses, kept with their notices in
-src/pointtransformerv3/ops/sparse_conv/THIRD_PARTY_LICENSES.md (installed as
-pointtransformerv3/ops/sparse_conv/THIRD_PARTY_LICENSES.md): ocnn-pytorch and FlexGEMM, MIT.
+src/point_transformer_v3/ops/sparse_conv/THIRD_PARTY_LICENSES.md (installed as
+point_transformer_v3/ops/sparse_conv/THIRD_PARTY_LICENSES.md): ocnn-pytorch and FlexGEMM, MIT.
 
 The demo scripts in demo/ (in the repository, not in the pip package) contain code adapted from
 the Utonia (https://github.com/Pointcept/Utonia) and Concerto

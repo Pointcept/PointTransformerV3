@@ -19,7 +19,7 @@ import numpy as np
 import torch
 from _common import drop_inputs, load_model, load_sample, parser, save, show
 
-import pointtransformerv3 as ptv3
+import point_transformer_v3 as ptv3
 
 # ScanNet-20 colors (the ScanNet benchmark palette)
 PALETTE = (

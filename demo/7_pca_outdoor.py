@@ -36,7 +36,7 @@ from _common import (
     show,
 )
 
-import pointtransformerv3 as ptv3
+import point_transformer_v3 as ptv3
 
 CONCERTO_OUTDOOR = ("Pointcept/Concerto", "concerto_large_outdoor.pth")
 CONCERTO_REVISION = "efc130718a564eba0ce4899318f3c20b19d9c752"  # as the concerto presets

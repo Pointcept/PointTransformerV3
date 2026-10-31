@@ -1,9 +1,9 @@
-"""Paths and cases shared by the parity scripts (no pointtransformerv3 import: dump_original.py
+"""Paths and cases shared by the parity scripts (no point_transformer_v3 import: dump_original.py
 runs in the original environment).
 
 External data and code come from environment variables, checked by the step that needs them
 (``env_path``; tests/parity/README.md lists them). Outputs go to ``$PTV3_PARITY_ROOT`` (default
-``~/.cache/pointtransformerv3/parity``). The Sonata demo scan and checkpoints are read where the
+``~/.cache/point_transformer_v3/parity``). The Sonata demo scan and checkpoints are read where the
 Sonata package downloads them (``~/.cache/sonata``); the Hugging Face weights from the hub cache.
 """
 
@@ -12,7 +12,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-ROOT = Path(os.environ.get("PTV3_PARITY_ROOT", "~/.cache/pointtransformerv3/parity")).expanduser()
+ROOT = Path(os.environ.get("PTV3_PARITY_ROOT", "~/.cache/point_transformer_v3/parity")).expanduser()
 INPUTS = ROOT / "inputs"
 ORIG = ROOT / "orig"
 NEW = ROOT / "new"

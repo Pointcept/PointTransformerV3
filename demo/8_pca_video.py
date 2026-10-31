@@ -52,12 +52,12 @@ from _common import (
     show,
 )
 
-import pointtransformerv3 as ptv3
+import point_transformer_v3 as ptv3
 
 IMAGES = (".png", ".jpg", ".jpeg", ".bmp", ".webp")
 OUT = OUTPUT / "video"
 NEEDS_VGGT = (
-    "this demo needs VGGT, which pointtransformerv3 does not install: uv run --with "
+    "this demo needs VGGT, which point-transformer-v3 does not install: uv run --with "
     '"vggt @ git+https://github.com/facebookresearch/vggt" --with "torchvision==0.27.*" '
     "demo/8_pca_video.py ... (see the docstring), or --input <points.npz>"
 )

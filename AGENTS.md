@@ -1,9 +1,9 @@
-# AGENTS.md: using and working on `pointtransformerv3`
+# AGENTS.md: using and working on `point-transformer-v3`
 
 ## Using the package
 
 ```python
-import pointtransformerv3 as ptv3
+import point_transformer_v3 as ptv3
 
 model = ptv3.load("sonata")                                # eval mode, on cuda/mps/cpu, warmed up
 feat = model.embed(coord, color, normal)                   # (N, 1232) for the N input points
@@ -81,7 +81,7 @@ scope is `src/`).
 ## Presets
 
 One model class (`PointTransformerV3`) and one `Config` dataclass; every released model is a
-preset in `src/pointtransformerv3/presets.py`: the full `Config`, the weight source (Hugging Face
+preset in `src/point_transformer_v3/presets.py`: the full `Config`, the weight source (Hugging Face
 repo, file, pinned revision, sha256, license), the preparation (`PrepareSpec`: grid size, feature
 columns, color range, coordinate scale) and its heads.
 
@@ -125,7 +125,7 @@ uv run --group parity python -m tests.parity.check   # parity: tests/parity/READ
 python benchmarks/bench.py gpu                        # benchmark: docs/benchmark.md (env vars)
 ```
 
-Layout: `src/pointtransformerv3/{model,modules,presets,convert,weights,api,preprocess,heads,
+Layout: `src/point_transformer_v3/{model,modules,presets,convert,weights,api,preprocess,heads,
 structure}.py`, `layers/` (norms, sparse conv module, init), `ops/` (functional ops and their
 Triton kernels). Most files are vendored from Pointcept2 at 771a949; each starts with a
 provenance line. Keep them close to the source so fixes can flow both ways. Their docstrings

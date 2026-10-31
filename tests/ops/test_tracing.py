@@ -9,7 +9,11 @@ import importlib.util
 
 import torch
 
-from pointtransformerv3.ops._tracing import CONSTANT_RESULT_MARKER, assume_constant_result, tracing
+from point_transformer_v3.ops._tracing import (
+    CONSTANT_RESULT_MARKER,
+    assume_constant_result,
+    tracing,
+)
 
 
 def test_marker_matches_torch():

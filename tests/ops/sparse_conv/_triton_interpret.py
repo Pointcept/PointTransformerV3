@@ -31,8 +31,8 @@ import sys
 
 import torch
 
-from pointtransformerv3.ops import _tracing
-from pointtransformerv3.ops.neighbors import build_kmap
+from point_transformer_v3.ops import _tracing
+from point_transformer_v3.ops.neighbors import build_kmap
 
 # (name, sample sizes, extent, kernel size, C_in, C_out, bias): channel counts that are not
 # multiples of the tiles, ragged samples, the k=5 stem, a single point and an empty input
@@ -116,7 +116,7 @@ def run(
     "expanded" (the first element of a sentinel-filled buffer, stride 0; CPU only). Both non-
     contiguous layouts leave sentinels where a stride-1 read of the bias would land.
     ``path``: "eager" (the default call) or "op" (the ``triton_op``, as while tracing)."""
-    from pointtransformerv3.ops.sparse_conv import triton_impl
+    from point_transformer_v3.ops.sparse_conv import triton_impl
 
     triton_impl.tracing = (lambda x: True) if path == "op" else _tracing.tracing
 

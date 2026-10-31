@@ -6,11 +6,11 @@ from __future__ import annotations
 import pytest
 import torch
 
-import pointtransformerv3 as ptv3
-from pointtransformerv3.convert import convert_state_dict, map_name
-from pointtransformerv3.modules import Rope3d
-from pointtransformerv3.presets import PRESETS
-from pointtransformerv3.weights import fetch, read_checkpoint, state_dict_of
+import point_transformer_v3 as ptv3
+from point_transformer_v3.convert import convert_state_dict, map_name
+from point_transformer_v3.modules import Rope3d
+from point_transformer_v3.presets import PRESETS
+from point_transformer_v3.weights import fetch, read_checkpoint, state_dict_of
 
 pytestmark = pytest.mark.weights
 ENCODERS = [name for name, p in PRESETS.items() if p.weights and not p.config["dec_depths"]]

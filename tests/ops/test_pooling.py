@@ -12,8 +12,8 @@ import torch
 import torch.nn.functional as F
 from torch import Tensor
 
-from pointtransformerv3.ops.pooling import REDUCES, PoolIndex, build_pool_index, pool, unpool
-from pointtransformerv3.structure import PointGrid
+from point_transformer_v3.ops.pooling import REDUCES, PoolIndex, build_pool_index, pool, unpool
+from point_transformer_v3.structure import PointGrid
 from tests.conftest import DEVICES, point_grid
 
 
@@ -338,7 +338,7 @@ def test_pool_unpool_export(synthetic_pack):
 @pytest.mark.parametrize("reduce", ["max", "mean", "min", "sum"])
 def test_mps_scatter_path_matches_segment_reduce(reduce, grouped):
     """``pool`` on MPS uses ``_pool_scatter`` (no ``segment_reduce`` there); run it on the CPU."""
-    from pointtransformerv3.ops.pooling import _pool_scatter
+    from point_transformer_v3.ops.pooling import _pool_scatter
 
     gen = torch.Generator().manual_seed(5)
     cluster = torch.unique(torch.randint(60, (500,), generator=gen), return_inverse=True)[1]

@@ -9,7 +9,7 @@ import pytest
 import torch
 import torch.nn.functional as F
 
-import pointtransformerv3 as ptv3
+import point_transformer_v3 as ptv3
 from tests.test_model import cloud
 
 pytestmark = pytest.mark.gpu

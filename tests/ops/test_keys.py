@@ -4,7 +4,7 @@ from __future__ import annotations
 import pytest
 import torch
 
-from pointtransformerv3.ops.keys import (
+from point_transformer_v3.ops.keys import (
     AXIS_BITS,
     BATCH_SHIFT,
     check_key_range,

@@ -8,7 +8,7 @@ import sys
 import pytest
 import torch
 
-import pointtransformerv3 as ptv3
+import point_transformer_v3 as ptv3
 
 
 def run(code: str) -> str:
@@ -24,7 +24,7 @@ def run(code: str) -> str:
 
 def test_import_is_lazy_and_fast():
     out = run(
-        "import sys, time; t = time.perf_counter(); import pointtransformerv3; "
+        "import sys, time; t = time.perf_counter(); import point_transformer_v3; "
         "dt = time.perf_counter() - t; "
         "print(dt, *[m in sys.modules for m in ('torch', 'triton', 'huggingface_hub')])"
     )
@@ -34,7 +34,7 @@ def test_import_is_lazy_and_fast():
 
 def test_cpu_forward_never_imports_triton_or_hub():
     out = run(
-        "import sys, torch, pointtransformerv3 as ptv3\n"
+        "import sys, torch, point_transformer_v3 as ptv3\n"
         "m = ptv3.load('ptv3', device='cpu')\n"
         "x = torch.rand(400, 3)\n"
         "f = m.embed(x, x * 255, torch.nn.functional.normalize(x, dim=1))\n"
@@ -69,9 +69,9 @@ def test_load_errors():
 
 def test_set_backend():
     ptv3.set_backend(attention="sdpa", conv="torch", layer_norm="torch")
-    from pointtransformerv3.ops.attention import get_attention_backend
-    from pointtransformerv3.ops.norm import get_layer_norm_backend
-    from pointtransformerv3.ops.sparse_conv import get_backend
+    from point_transformer_v3.ops.attention import get_attention_backend
+    from point_transformer_v3.ops.norm import get_layer_norm_backend
+    from point_transformer_v3.ops.sparse_conv import get_backend
 
     assert (get_attention_backend(), get_backend(), get_layer_norm_backend()) == (
         "sdpa",
@@ -84,7 +84,7 @@ def test_set_backend():
 
 
 def test_presets_are_complete_configs():
-    from pointtransformerv3.model import Config
+    from point_transformer_v3.model import Config
 
     fields = set(Config.__dataclass_fields__)
     for name, preset in ptv3.PRESETS.items():

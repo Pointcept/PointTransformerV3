@@ -9,7 +9,7 @@ Two environments, two GPU sessions. External data and code come from environment
 | `PTV3_PARITY_SONATA_REPO` | a git clone of github.com/facebookresearch/sonata (with 18c09ff) | dump_original.py (first run) |
 | `PTV3_PARITY_UTONIA_REPO` | a git clone of github.com/Pointcept/Utonia-Manifold (with be53e4a) | dump_original.py `utonia*` steps (first run) |
 | `PTV3_PARITY_SCANNET` | processed ScanNet: `index.json` and one `.safetensors` file per scene | the full-val steps (`val`, `valpick`, `p4val`, `sonata_val_inputs`) |
-| `PTV3_PARITY_ROOT` | outputs (optional; default `~/.cache/pointtransformerv3/parity`) | all |
+| `PTV3_PARITY_ROOT` | outputs (optional; default `~/.cache/point_transformer_v3/parity`) | all |
 
 The Sonata checkpoints and demo scan are read from `~/.cache/sonata` (where `sonata.load` and
 `sonata.data.load` put them), the PTv3 release and the Utonia weights from the Hugging Face cache.
@@ -50,5 +50,5 @@ on both sides; `torch.manual_seed` is set before every forward.
 | P5 | CPU fp32 vs CUDA fp32 (this package) | <= 1e-4 |
 | P6 | Utonia (3D RoPE, head_dim 18) vs be53e4a on sample1 and scene0342_00, as P3 | as P3 |
 
-Outputs: `~/.cache/pointtransformerv3/parity/{inputs,orig}` (a few GB) and `report-*.json`.
+Outputs: `~/.cache/point_transformer_v3/parity/{inputs,orig}` (a few GB) and `report-*.json`.
 Results: docs/parity.md.

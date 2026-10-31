@@ -11,7 +11,7 @@ import warnings
 import pytest
 import torch
 
-from pointtransformerv3.ops.gather import (
+from point_transformer_v3.ops.gather import (
     gather_rows,
     gather_source,
     permute_rows,

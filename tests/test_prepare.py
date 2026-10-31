@@ -1,4 +1,4 @@
-"""pointtransformerv3.prepare / collate: centering, grid-cell round trip, features per preset."""
+"""point_transformer_v3.prepare / collate: centering, grid-cell round trip, features per preset."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 import torch
 
-import pointtransformerv3 as ptv3
+import point_transformer_v3 as ptv3
 
 
 def raw(n: int = 2000, seed: int = 0):

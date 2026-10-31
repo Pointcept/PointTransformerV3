@@ -4,7 +4,7 @@
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Pointcept/PointTransformerV3/main/assets/teaser.png">
     <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Pointcept/PointTransformerV3/main/assets/teaser.png">
     <!-- /pypi-strip -->
-    <img alt="pointtransformerv3" src="https://raw.githubusercontent.com/Pointcept/PointTransformerV3/main/assets/teaser.png" width="800">
+    <img alt="point-transformer-v3" src="https://raw.githubusercontent.com/Pointcept/PointTransformerV3/main/assets/teaser.png" width="800">
     <!-- pypi-strip -->
     </picture><br>
     <!-- /pypi-strip -->
@@ -14,7 +14,7 @@ This repo is the official project repository of the paper **Point Transformer V3
 IEEE Conference on Computer Vision and Pattern Recognition (**CVPR**) 2024 - Oral  
 [ Backbone ] [PTv3] - [ [arXiv](https://arxiv.org/abs/2312.10035) ] [ [Bib](https://xywu.me/research/ptv3/bib.txt) ] [ [Weight](https://huggingface.co/Pointcept/PointTransformerV3) ]
 
-It is also a pip package, `pointtransformerv3`: PTv3 in plain PyTorch, with Triton kernels on the GPU. Besides PTv3, it runs the released weights of the pre-training works built on PTv3:
+It is also a pip package, `point-transformer-v3`: PTv3 in plain PyTorch, with Triton kernels on the GPU. Besides PTv3, it runs the released weights of the pre-training works built on PTv3:
 
 - **Sonata: Self-Supervised Learning of Reliable Point Representations**  
 IEEE Conference on Computer Vision and Pattern Recognition (**CVPR**) 2025 - Highlight  
@@ -30,7 +30,7 @@ International Conference on Machine Learning (**ICML**) 2026
 
 ## Highlights
 
-- *Oct 2026*: PTv3 is now a pip package, `pointtransformerv3`, with optimizations from Pointcept2, our next codebase. It needs no spconv or FlashAttention (plain PyTorch with Triton kernels), runs 1.7-4.7x faster with 18-31% less memory on the GPU, also runs on the CPU, and loads the Sonata, Concerto and Utonia weights. See [docs/acceleration.md](https://github.com/Pointcept/PointTransformerV3/blob/main/docs/acceleration.md).
+- *Oct 2026*: PTv3 is now a pip package, `point-transformer-v3`, with optimizations from Pointcept2, our next codebase. It needs no spconv or FlashAttention (plain PyTorch with Triton kernels), runs 1.7-4.7x faster with 18-31% less memory on the GPU, also runs on the CPU, and loads the Sonata, Concerto and Utonia weights. See [docs/acceleration.md](https://github.com/Pointcept/PointTransformerV3/blob/main/docs/acceleration.md).
 - *Apr 2024*: PTv3 is selected as one of the 90 Oral presentations of CVPR'24.
 - *Feb 2024*: PTv3 is accepted by CVPR'24.
 - *Dec 2023*: We released the model code of PTv3 and the experiment records for ScanNet and ScanNet200.
@@ -51,8 +51,8 @@ Forward time of the original code → this package, median on one RTX PRO 6000 w
 ## Install
 
 ```bash
-pip install pointtransformerv3     # needs torch >= 2.10; install torch first for another CUDA build
-uv add pointtransformerv3          # in a uv project
+pip install point-transformer-v3   # needs torch >= 2.10; install torch first for another CUDA build
+uv add point-transformer-v3        # in a uv project
 ```
 
 From source, with [uv](https://docs.astral.sh/uv/):
@@ -65,7 +65,7 @@ uv sync                            # Python 3.12, torch with CUDA 13 on Linux; -
 ## Get features
 
 ```python
-import pointtransformerv3 as ptv3
+import point_transformer_v3 as ptv3
 
 model = ptv3.load("sonata")                  # downloads the weights once; fp16 on CUDA
 feat = model.embed(coord, color, normal)     # (N, 1232) features for the N input points

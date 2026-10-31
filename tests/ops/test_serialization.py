@@ -17,8 +17,8 @@ import pytest
 import torch
 from torch import Tensor
 
-from pointtransformerv3.ops import serialization
-from pointtransformerv3.ops.serialization import MAX_DEPTH, ORDERS, decode, encode, serialize
+from point_transformer_v3.ops import serialization
+from point_transformer_v3.ops.serialization import MAX_DEPTH, ORDERS, decode, encode, serialize
 from tests.conftest import DEVICES
 
 DEPTHS = range(1, MAX_DEPTH + 1)

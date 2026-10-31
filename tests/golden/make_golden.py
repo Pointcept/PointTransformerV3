@@ -8,7 +8,7 @@ from pathlib import Path
 
 import torch
 
-import pointtransformerv3 as ptv3
+import point_transformer_v3 as ptv3
 
 PATH = Path(__file__).with_name("presets.pt")
 PRESETS = ("ptv3", "ptv3_scannet", "sonata", "sonata_small", "utonia")

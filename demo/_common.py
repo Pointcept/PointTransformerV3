@@ -22,7 +22,7 @@ from typing import Any
 import numpy as np
 import torch
 
-import pointtransformerv3 as ptv3
+import point_transformer_v3 as ptv3
 
 # Hugging Face dataset with the demo samples (``pointcept/demo``), pinned revision.
 DEMO_REPO = "pointcept/demo"

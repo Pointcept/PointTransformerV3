@@ -34,7 +34,7 @@ from _common import (
     show,
 )
 
-import pointtransformerv3 as ptv3
+import point_transformer_v3 as ptv3
 
 if __name__ == "__main__":
     p = parser(__doc__, models=UTONIA, sample="sample3_object")
