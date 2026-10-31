@@ -51,15 +51,18 @@ Forward time of the original code → this package, median on one RTX PRO 6000 w
 ## Install
 
 ```bash
-pip install point-transformer-v3   # needs torch >= 2.10; install torch first for another CUDA build
-uv add point-transformer-v3        # in a uv project
+pip install point-transformer-v3                            # torch >= 2.10 from PyPI
+uv pip install point-transformer-v3 --torch-backend=auto    # uv picks the torch build for your driver
 ```
+
+The package only asks for `torch>=2.10`, so any build works (CUDA, CPU, MPS). For a specific CUDA
+build with pip, install torch from [pytorch.org](https://pytorch.org/get-started/locally/) first.
 
 From source, with [uv](https://docs.astral.sh/uv/):
 
 ```bash
 git clone https://github.com/Pointcept/PointTransformerV3 && cd PointTransformerV3
-uv sync                            # Python 3.12, torch with CUDA 13 on Linux; --extra cu126 or --extra cpu
+uv sync                  # Python 3.12, torch from PyPI (CUDA 13 on Linux); --group cu126 or --group cpu
 ```
 
 ## Get features

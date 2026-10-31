@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "point-transformer-v3"
-version = "0.1.1"
+version = "0.1.2"
 description = "Point Transformer V3 in pure PyTorch and Triton: runs the PTv3, Sonata, Concerto and Utonia weights."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -34,20 +34,17 @@ dependencies = [
 [project.optional-dependencies]
 # Demos: open3d viewers (the demos also run headless without open3d).
 demo = ["open3d>=0.19; python_version < '3.13'"]
-# Default (no extra): torch from PyPI, which is the CUDA 13 build on Linux x86_64 and the CPU/MPS
-# build on macOS. Pick at most one extra to override it and pass it to every `uv sync` / `uv run`
-# (e.g. `uv sync --extra cu126`):
-#   cpu:   CPU-only wheels (small; laptops, CI)
-#   cu126: CUDA 12.6 wheels (older drivers)
-# Both only work with uv in a source checkout ([tool.uv.sources] below picks the index). The
-# published metadata keeps them as plain torch requirements, so pip users install the torch build
-# they want first.
-cpu = ["torch>=2.10"]
-cu126 = ["torch>=2.10"]
 
 [dependency-groups]
 dev = ["pytest>=8.3", "ruff>=0.7", "pyright>=1.1.390"]
 parity = ["safetensors>=0.4"]  # tests/parity: reads processed ScanNet scenes (full-val mIoU)
+# torch build for a source checkout with uv (not part of the published package): by default torch
+# comes from PyPI (the CUDA 13 build on Linux x86_64, the CPU/MPS build on macOS). Pick at most one
+# group to override it, e.g. `uv sync --group cu126`:
+#   cpu:   CPU-only wheels (small; laptops, CI)
+#   cu126: CUDA 12.6 wheels (older drivers)
+cpu = ["torch>=2.10"]
+cu126 = ["torch>=2.10"]
 
 [project.urls]
 Homepage = "https://github.com/Pointcept/PointTransformerV3"
@@ -65,7 +62,7 @@ include = ["/src/point_transformer_v3", "/README.md", "/LICENSE", "/NOTICE"]
 # uv-managed CPython only: it ships Python.h, which Triton needs once to build its CUDA launcher
 # helper; distro Pythons often lack the headers.
 python-preference = "only-managed"
-conflicts = [[{ extra = "cpu" }, { extra = "cu126" }]]
+conflicts = [[{ group = "cpu" }, { group = "cu126" }]]
 # The lock pins the torch release the parity tests and benchmarks ran on (the Triton kernels'
 # launch configs were tuned there); bumping it reruns tests/parity and benchmarks/bench.py.
 constraint-dependencies = ["torch==2.12.*"]
@@ -82,8 +79,8 @@ explicit = true
 
 [tool.uv.sources]
 torch = [
-  { index = "pytorch-cpu", extra = "cpu" },
-  { index = "pytorch-cu126", extra = "cu126" },
+  { index = "pytorch-cpu", group = "cpu" },
+  { index = "pytorch-cu126", group = "cu126" },
 ]
 
 [tool.ruff]
