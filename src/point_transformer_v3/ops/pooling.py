@@ -188,7 +188,8 @@ def pool(feat: Tensor, index: PoolIndex, reduce: Reduce = "max") -> Tensor:
         feat: ``(N, ...)`` one row per fine row.
         returns: ``(M, ...)`` one row per coarse row, in feat's dtype.
 
-    Sync-free. ``"max"``/``"min"`` split the gradient evenly between tied children.
+    Sync-free. ``"max"``/``"min"`` split the gradient evenly between tied children (``_Extremum``:
+    torch's ``segment_reduce`` backward divides only positive gradients by the tie count).
     """
     if reduce not in REDUCES:
         raise ValueError(f"reduce must be one of {REDUCES}, got {reduce!r}")
@@ -196,6 +197,8 @@ def pool(feat: Tensor, index: PoolIndex, reduce: Reduce = "max") -> Tensor:
     if feat.device.type == "mps":
         return _pool_scatter(feat, index, reduce)
     src = feat if index.grouped else permute_rows(feat, index.sort)
+    if reduce in ("max", "min") and src.requires_grad and torch.is_grad_enabled():
+        return _Extremum.apply(src, index.ptr, index.inverse, index.sort, index.grouped, reduce)
     return torch.segment_reduce(src, reduce, offsets=index.ptr, axis=0, unsafe=True)
 
 
@@ -234,6 +237,43 @@ def unpool(feat: Tensor, index: PoolIndex) -> Tensor:
 
 
 # ---- autograd
+
+
+class _Extremum(torch.autograd.Function):
+    """Segment max / min whose backward splits each coarse row's gradient evenly between its
+    tied children, also for negative gradients. torch 2.12's ``segment_reduce`` backward divides
+    only positive gradients by the tie count, so a negative gradient reaches every tied child in
+    full. Ties are common in bf16; in Pointcept2's ScanNet training this blew the gradient norm up
+    from about 2 to 40-60 within 300 steps. Ported from Pointcept2 ``ops/pooling.py`` (5c8535b)."""
+
+    @staticmethod
+    def forward(
+        ctx: Any,
+        src: Tensor,
+        ptr: Tensor,
+        inverse: Tensor,
+        sort: Tensor,
+        grouped: bool,
+        reduce: str,
+    ) -> Tensor:
+        out = torch.segment_reduce(src, reduce, offsets=ptr, axis=0, unsafe=True)
+        ctx.save_for_backward(src, out, ptr, inverse, sort)
+        ctx.grouped = grouped
+        return out
+
+    @staticmethod
+    def backward(  # pyright: ignore[reportIncompatibleMethodOverride]
+        ctx: Any, *grad_outputs: Tensor
+    ) -> tuple[Tensor | None, None, None, None, None, None]:
+        (grad,) = grad_outputs
+        src, out, ptr, inverse, sort = ctx.saved_tensors
+        seg = inverse if ctx.grouped else inverse[sort]  # coarse row of each src row, in range
+        hit = src == gather_rows(out, seg)
+        # tie counts are small integers: exact in fp16 up to 2048 (bf16: 256), half the bytes
+        exact = torch.float16 if src.element_size() <= 2 else src.dtype
+        count = torch.segment_reduce(hit.to(exact), "sum", offsets=ptr, axis=0, unsafe=True)
+        share = (grad.float() / count.float().clamp_min(1.0)).to(grad.dtype)
+        return torch.where(hit, gather_rows(share, seg), 0), None, None, None, None, None
 
 
 class _Unpool(torch.autograd.Function):

@@ -230,7 +230,10 @@ def test_cuda_padded_gather_is_exact(cuda, synthetic_pack, channels, dtype):
     feat = torch.randn(5000, channels, device=cuda).to(dtype).requires_grad_()
     ref = feat.detach().clone().requires_grad_()
     out = pool(feat, index, "max")
-    want = torch.segment_reduce(ref[index.sort], "max", offsets=index.ptr, axis=0)
+    rows = torch.arange(index.num_fine, device=cuda)
+    grouped = PoolIndex(index.inverse[index.sort], rows, index.ptr, index.ptr[:-1], grouped=True)
+    want = pool(ref[index.sort], grouped, "max")  # plain torch gather, the same reduction
+    assert torch.equal(want, torch.segment_reduce(ref[index.sort], "max", offsets=index.ptr))
     assert torch.equal(out, want)
     grad = torch.randn_like(out)
     assert torch.equal(*torch.autograd.grad([out, want], [feat, ref], [grad, grad]))
@@ -364,3 +367,37 @@ def test_mps_scatter_path_matches_segment_reduce(reduce, grouped):
     half = _pool_scatter(feat.detach().bfloat16(), index, reduce)
     assert half.dtype == torch.bfloat16
     torch.testing.assert_close(half.float(), want.detach(), rtol=2e-2, atol=2e-2)
+
+
+@pytest.mark.parametrize("dtype", [torch.float32, torch.bfloat16])
+@pytest.mark.parametrize("grouped", [False, True])
+@pytest.mark.parametrize("reduce", ["max", "min"])
+@pytest.mark.parametrize("device", DEVICES)
+def test_pool_splits_tied_gradients_evenly(device, reduce, grouped, dtype):
+    """Every tied child gets grad / ties, for negative gradients too (torch's segment_reduce
+    backward gives a negative gradient to each tied child in full), so each coarse row's
+    gradient sums to its upstream gradient."""
+    cluster = torch.tensor([0, 0, 0, 1, 1, 2, 2, 2, 2, 3])
+    if not grouped:
+        cluster = cluster[torch.tensor([3, 9, 0, 5, 1, 6, 4, 2, 8, 7])]
+    index = index_from_clusters(cluster)
+    if grouped:
+        index = PoolIndex(index.inverse, index.sort, index.ptr, index.head, grouped=True)
+    index = PoolIndex(*(t.to(device) for t in (index.inverse, index.sort, index.ptr, index.head)),
+                      grouped=index.grouped)  # fmt: skip
+    gen = torch.Generator().manual_seed(4)
+    feat = torch.randint(0, 2, (10, 6), generator=gen).to(device, dtype)  # many ties
+    grad = torch.randn(4, 6, generator=gen).to(device, dtype)
+    grad[:, :3] = -grad[:, :3].abs()  # negative and positive upstream gradients
+    leaf = feat.clone().requires_grad_()
+    (got,) = torch.autograd.grad(pool(leaf, index, reduce), leaf, grad)
+    c = cluster.to(device)
+    want = reference_pool(feat, c, reduce)
+    hit = feat == want[c]
+    ties = torch.zeros(4, 6, device=device).index_add_(0, c, hit.float())
+    expected = torch.where(hit, (grad.float() / ties)[c], 0).to(dtype)
+    torch.testing.assert_close(got, expected)
+    sums = torch.zeros(4, 6, device=device).index_add_(0, c, got.float())
+    torch.testing.assert_close(sums, grad.float(), rtol=1e-2, atol=1e-2)
+    with torch.no_grad():  # inference takes torch's kernel: the same values
+        assert torch.equal(pool(feat, index, reduce), want)
